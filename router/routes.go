@@ -9,6 +9,11 @@ import (
 func initRoutes(router *gin.Engine) {
 	v1 := router.Group("/api/v1")
 	{
+		v1.GET("/", func(context *gin.Context) {
+			context.JSON(http.StatusOK, gin.H{
+				"message": "Application is running!",
+			})
+		})
 		v1.GET("/details/:address", func(context *gin.Context) {
 			context.JSON(http.StatusOK, gin.H{
 				"message": "GET /details/:address",
