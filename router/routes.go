@@ -8,6 +8,7 @@ import (
 )
 
 func initRoutes(router *gin.Engine) {
+	controller.InitController()
 	v1 := router.Group("/api/v1")
 	{
 		v1.GET("/", func(context *gin.Context) {
@@ -20,11 +21,7 @@ func initRoutes(router *gin.Engine) {
 
 		v1.GET("/balance/:address", controller.Balance)
 
-		v1.POST("/send", func(context *gin.Context) {
-			context.JSON(http.StatusOK, gin.H{
-				"message": "POST /send",
-			})
-		})
+		v1.POST("/send", controller.Send)
 
 		v1.GET("/tx/:tx", func(context *gin.Context) {
 			context.JSON(http.StatusOK, gin.H{
