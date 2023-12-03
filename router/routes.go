@@ -15,13 +15,10 @@ func initRoutes(router *gin.Engine) {
 				"message": "Application is running!",
 			})
 		})
+
 		v1.GET("/details/:address", controller.Details)
 
-		v1.GET("/balance/:address", func(context *gin.Context) {
-			context.JSON(http.StatusOK, gin.H{
-				"message": "GET /balance/:address",
-			})
-		})
+		v1.GET("/balance/:address", controller.Balance)
 
 		v1.POST("/send", func(context *gin.Context) {
 			context.JSON(http.StatusOK, gin.H{
