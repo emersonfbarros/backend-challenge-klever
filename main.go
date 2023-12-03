@@ -1,19 +1,22 @@
 package main
 
 import (
-	"log"
 	"os"
 
 	"github.com/emersonfbarros/backend-challenge-klever/config"
 	"github.com/emersonfbarros/backend-challenge-klever/router"
 )
 
+var logger *config.Logger
+
 func main() {
+	logger = config.GetLogger("main")
 	// initialize router
 	err := config.Init()
 
 	if err != nil {
-		log.Fatalf("Config initialization error: %v", err)
+		logger.Errorf("config initialization error: %v", err)
+		os.Exit(1)
 	}
 
 	// get port from env
