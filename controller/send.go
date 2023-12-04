@@ -30,7 +30,10 @@ func Send(context *gin.Context) {
 	btcTransactionData.Amount = new(big.Int)
 	btcTransactionData.Amount.SetString(request.Amount, 10)
 
-	service.Send(&btcTransactionData)
+	utxos, err := service.Send(&btcTransactionData)
+	if err != nil {
+		sendError(context, http.StatusBadGateway, err.Error())
+	}
 
-	sendSuccess(context, btcTransactionData)
+	sendSuccess(context, *utxos)
 }
