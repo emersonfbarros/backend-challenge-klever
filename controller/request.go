@@ -5,12 +5,12 @@ import (
 	"math/big"
 )
 
-type SendBtc struct {
+type sendBtc struct {
 	Address string `json:"address"`
 	Amount  string `json:"amount"`
 }
 
-func (r *SendBtc) Validate() error {
+func (r *sendBtc) Validate() error {
 	if r.Address == "" && r.Amount == "" {
 		return fmt.Errorf("Request body is empty or malformed")
 	}

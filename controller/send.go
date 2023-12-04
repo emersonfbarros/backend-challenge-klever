@@ -7,14 +7,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type SendBtcConverted struct {
+type sendBtcConverted struct {
 	Address string
 	Amount  *big.Int
 }
 
 func Send(context *gin.Context) {
-	request := SendBtc{}
-	btcTransactionData := SendBtcConverted{}
+	request := sendBtc{}
+	btcTransactionData := sendBtcConverted{}
 
 	if err := context.BindJSON(&request); err != nil {
 		logger.Errorf("json bind error: %v", err)
