@@ -6,11 +6,13 @@ import (
 )
 
 type UtxoRes struct {
+	Txid          string `json:"txid"`
 	Value         string `json:"value"`
 	Confirmations string `json:"confirmations"`
 }
 
 type UtxoConverted struct {
+	Txid          string
 	Value         *big.Int
 	Confirmations string
 }
