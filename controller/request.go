@@ -22,9 +22,12 @@ func (r *SendBtc) Validate() error {
 	}
 
 	a := new(big.Int)
-	_, ok := a.SetString(r.Amount, 10)
+	a, ok := a.SetString(r.Amount, 10)
 	if !ok {
 		return fmt.Errorf("'amount' must be a valid number")
+	}
+	if a.Sign() <= 0 {
+		return fmt.Errorf("'amount' must be greater than zero")
 	}
 	return nil
 }
