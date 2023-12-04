@@ -7,7 +7,7 @@ import (
 )
 
 func Send(context *gin.Context) {
-	request := SentBtc{}
+	request := SendBtc{}
 
 	if err := context.BindJSON(&request); err != nil {
 		logger.Errorf("json bind error: %v", err)
