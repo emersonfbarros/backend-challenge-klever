@@ -4,17 +4,13 @@ import (
 	"math/big"
 	"net/http"
 
+	"github.com/emersonfbarros/backend-challenge-klever/service"
 	"github.com/gin-gonic/gin"
 )
 
-type sendBtcConverted struct {
-	Address string
-	Amount  *big.Int
-}
-
 func Send(context *gin.Context) {
 	request := sendBtc{}
-	btcTransactionData := sendBtcConverted{}
+	btcTransactionData := service.SendBtcConverted{}
 
 	if err := context.BindJSON(&request); err != nil {
 		logger.Errorf("json bind error: %v", err)
@@ -22,6 +18,7 @@ func Send(context *gin.Context) {
 		return
 	}
 
+	// validate request body
 	if err := request.Validate(); err != nil {
 		logger.Errorf("validation error: %v", err.Error())
 		sendError(context, http.StatusBadRequest, err.Error())
@@ -29,8 +26,11 @@ func Send(context *gin.Context) {
 	}
 
 	btcTransactionData.Address = request.Address
+	// convert amount to big.Int
 	btcTransactionData.Amount = new(big.Int)
 	btcTransactionData.Amount.SetString(request.Amount, 10)
+
+	service.Send(&btcTransactionData)
 
 	sendSuccess(context, btcTransactionData)
 }
