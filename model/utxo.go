@@ -8,13 +8,13 @@ import (
 type UtxoRes struct {
 	Txid          string `json:"txid"`
 	Value         string `json:"value"`
-	Confirmations string `json:"confirmations"`
+	Confirmations int    `json:"confirmations"`
 }
 
 type UtxoConverted struct {
 	Txid          string
 	Value         *big.Int
-	Confirmations string
+	Confirmations int
 }
 
 func Utxo(address string) (*[]UtxoConverted, error) {
@@ -34,6 +34,7 @@ func Utxo(address string) (*[]UtxoConverted, error) {
 		valueBigInt.SetString(utxo.Value, 10)
 
 		utxoConverted = append(utxoConverted, UtxoConverted{
+			Txid:          utxo.Txid,
 			Value:         valueBigInt,
 			Confirmations: utxo.Confirmations,
 		})
