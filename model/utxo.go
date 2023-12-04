@@ -15,8 +15,8 @@ type UtxoConverted struct {
 	Confirmations string
 }
 
-func Utxo(value string) (*[]UtxoConverted, error) {
-	body, err := Fetch("utxo", value)
+func Utxo(address string) (*[]UtxoConverted, error) {
+	body, err := Fetch("utxo", address)
 	if err != nil {
 		return nil, err
 	}
