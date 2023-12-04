@@ -1,6 +1,9 @@
 package controller
 
-import "fmt"
+import (
+	"fmt"
+	"math/big"
+)
 
 type SentBtc struct {
 	Address string `json:"address"`
@@ -16,6 +19,12 @@ func (r *SentBtc) Validate() error {
 	}
 	if r.Amount == "" {
 		return fmt.Errorf("'amount' is required")
+	}
+
+	a := new(big.Int)
+	_, ok := a.SetString(r.Amount, 10)
+	if !ok {
+		return fmt.Errorf("'amount' must be a valid number")
 	}
 	return nil
 }
