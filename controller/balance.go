@@ -10,7 +10,7 @@ import (
 func Balance(context *gin.Context) {
 	address := context.Param("address")
 
-	balance, err := service.Balance(address)
+	balance, err := service.BalanceCalc(address)
 	if err != nil {
 		sendError(context, http.StatusBadGateway, err.Error())
 	}
