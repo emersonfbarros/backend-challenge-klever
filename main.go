@@ -11,7 +11,6 @@ var logger *config.Logger
 
 func main() {
 	logger = config.GetLogger("main")
-	// initialize router
 	err := config.Init()
 
 	if err != nil {
