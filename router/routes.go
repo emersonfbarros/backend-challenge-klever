@@ -25,10 +25,6 @@ func initRoutes(router *gin.Engine) {
 
 		v1.GET("/tx/:tx", controller.Tx)
 
-		v1.GET("/health", func(context *gin.Context) {
-			context.JSON(http.StatusOK, gin.H{
-				"message": "GET /health",
-			})
-		})
+		v1.GET("/health", controller.Health)
 	}
 }
