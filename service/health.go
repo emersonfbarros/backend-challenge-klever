@@ -58,7 +58,7 @@ func Health() *HealthRes {
 
 	wg.Wait()
 
-	extApiResTime := strconv.FormatInt(time.Since(startTime).Microseconds(), 10)
+	extApiResTime := strconv.FormatInt(time.Since(startTime).Milliseconds(), 10)
 
 	var extApiStatus string
 	if successCount == 3 {
