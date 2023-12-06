@@ -22,8 +22,8 @@ type UtxoNeeded struct {
 	Utxos []Utxo `json:"utxos"`
 }
 
-func Send(btcTransactionData *SendBtcConverted) (*UtxoNeeded, error) {
-	utxoRef, err := model.Utxo(btcTransactionData.Address)
+func (s *Services) Send(models model.IModels, btcTransactionData *SendBtcConverted) (*UtxoNeeded, error) {
+	utxoRef, err := models.Utxo(fetcher, btcTransactionData.Address)
 	if err != nil {
 		logger.Errorf("failed to unmarshal api response %v", err.Error())
 		return nil, fmt.Errorf("failed to request external resouce")
