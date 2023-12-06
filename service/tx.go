@@ -17,8 +17,8 @@ type Address struct {
 	Value   string `json:"value"`
 }
 
-func Tx(txId string) (*Transaction, error) {
-	txRef, err := model.GetTx(txId)
+func (s *Services) Tx(models model.IModels, txId string) (*Transaction, error) {
+	txRef, err := models.GetTx(fetcher, txId)
 	if err != nil {
 		logger.Errorf("failed to unmarshal api response %v", err.Error())
 		return nil, fmt.Errorf("failed to request external resouce")
