@@ -43,6 +43,8 @@ func TestAddressSuccess(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, result)
 	assert.Equal(t, testResponse, result)
+
+	mockFetcher.AssertExpectations(t)
 }
 
 func TestAddressError(t *testing.T) {
@@ -58,4 +60,6 @@ func TestAddressError(t *testing.T) {
 	// assertions
 	assert.Error(t, err)
 	assert.Nil(t, result)
+
+	mockFetcher.AssertExpectations(t)
 }
