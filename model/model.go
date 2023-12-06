@@ -6,6 +6,11 @@ import (
 	"github.com/emersonfbarros/backend-challenge-klever/config"
 )
 
+type DataProcessors interface {
+	Utxo(fetcher Fetcher, address string) (*[]UtxoConverted, error)
+}
+
+type APIDataHandler struct{}
 
 var logger *config.Logger
 
