@@ -10,18 +10,6 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-type MockLogger struct {
-	mock.Mock
-}
-
-func (m *MockLogger) Infof(format string, args ...interface{}) {
-	m.Called(format, args)
-}
-
-func (m *MockLogger) Errorf(format string, args ...interface{}) {
-	m.Called(format, args)
-}
-
 func TestFetchSuccess(t *testing.T) {
 	type args struct {
 		route string
@@ -127,9 +115,17 @@ func TestFetchSuccess(t *testing.T) {
 	}
 }
 
-// the way the http.NewRequest function was implemented in line 17 of Fetch method
-// will never return an error, so it is not possible to test the code block
-// within the if after it
+type MockLogger struct {
+	mock.Mock
+}
+
+func (m *MockLogger) Infof(format string, args ...interface{}) {
+	m.Called(format, args)
+}
+
+func (m *MockLogger) Errorf(format string, args ...interface{}) {
+	m.Called(format, args)
+}
 
 func TestFetchHttpRequestError(t *testing.T) {
 	InitModel()
@@ -140,31 +136,29 @@ func TestFetchHttpRequestError(t *testing.T) {
 		logger = originalLogger // restores the original logger after test
 	}()
 
-	t.Run("Error on create", func(t *testing.T) {
-		// Create a mock server
-		server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {}))
-		// closes mock server early for request to fail
-		server.Close()
+	// Create a mock server
+	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {}))
+	// closes mock server early for request to fail
+	server.Close()
 
-		os.Setenv("BASE_URL", server.URL)
+	os.Setenv("BASE_URL", server.URL)
 
-		// creates fetcher for tests
-		fetcher := &Fetcher{
-			BaseURL:  os.Getenv("BASE_URL"),
-			Username: os.Getenv("USERNAME"),
-			Password: os.Getenv("PASSWORD"),
-		}
+	// creates fetcher for tests
+	fetcher := &Fetcher{
+		BaseURL:  os.Getenv("BASE_URL"),
+		Username: os.Getenv("USERNAME"),
+		Password: os.Getenv("PASSWORD"),
+	}
 
-		mockLogger.On("Errorf", mock.Anything, mock.Anything).Return()
+	mockLogger.On("Errorf", mock.Anything, mock.Anything).Return()
 
-		got, err := fetcher.Fetch("utxo", "v4al1d4DDr355")
-		if err != nil != true {
-			t.Errorf("Fetch() error = %v, wantErr %v", err, true)
-			return
-		}
-		if !reflect.DeepEqual(len(got), 0) {
-			t.Errorf("Fetch() = %v, want %v", len(got), 0)
-		}
-		mockLogger.AssertCalled(t, "Errorf", "failed to make http request %v", mock.Anything)
-	})
+	got, err := fetcher.Fetch("utxo", "v4al1d4DDr355")
+	if err != nil != true {
+		t.Errorf("Fetch() error = %v, wantErr %v", err, true)
+		return
+	}
+	if !reflect.DeepEqual(len(got), 0) {
+		t.Errorf("Fetch() = %v, want %v", len(got), 0)
+	}
+	mockLogger.AssertCalled(t, "Errorf", "failed to make http request %v", mock.Anything)
 }
