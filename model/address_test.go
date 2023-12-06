@@ -22,6 +22,7 @@ func (m *MockFetcher) Fetch(route string, value string) ([]byte, error) {
 func TestAddressSuccess(t *testing.T) {
 	// creates fetcher mock and model
 	mockFetcher := new(MockFetcher)
+
 	models := &Models{}
 
 	// test data
@@ -32,9 +33,9 @@ func TestAddressSuccess(t *testing.T) {
 		TotalSent:     "500",
 		TotalReceived: "1500",
 	}
-	responseJSON, _ := json.Marshal(testResponse)
+	expectedBytes, _ := json.Marshal(testResponse)
 
-	mockFetcher.On("Fetch", "address", testAddress).Return(responseJSON, nil)
+	mockFetcher.On("Fetch", "address", testAddress).Return(expectedBytes, nil)
 
 	// calls method
 	result, err := models.Address(mockFetcher, testAddress)
@@ -47,12 +48,37 @@ func TestAddressSuccess(t *testing.T) {
 	mockFetcher.AssertExpectations(t)
 }
 
-func TestAddressError(t *testing.T) {
-	responseJSON, _ := json.Marshal(nil)
+func TestAddressErrorFetch(t *testing.T) {
+	expectedBytes, _ := json.Marshal(nil)
+
 	testAddress := "test_address"
+
 	mockFetcher := new(MockFetcher)
+
 	models := &Models{}
-	mockFetcher.On("Fetch", "address", testAddress).Return(responseJSON, errors.New("fetch error"))
+
+	mockFetcher.On("Fetch", "address", testAddress).Return(expectedBytes, errors.New("fetch error"))
+
+	// calls method
+	result, err := models.Address(mockFetcher, testAddress)
+
+	// assertions
+	assert.Error(t, err)
+	assert.Nil(t, result)
+
+	mockFetcher.AssertExpectations(t)
+}
+
+func TestAddressErrorUnmarshal(t *testing.T) {
+	expectedBytes := []byte("invalid")
+
+	testAddress := "test_address"
+
+	mockFetcher := new(MockFetcher)
+
+	models := &Models{}
+
+	mockFetcher.On("Fetch", "address", testAddress).Return(expectedBytes, errors.New("fetch error"))
 
 	// calls method
 	result, err := models.Address(mockFetcher, testAddress)
