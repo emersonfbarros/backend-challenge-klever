@@ -5,9 +5,23 @@ import (
 	"github.com/emersonfbarros/backend-challenge-klever/model"
 )
 
+type IServices interface {
+	BalanceCalc(models model.IModels, address string) (*BalanceResult, error)
+}
+
+type Services struct{}
+
 var logger *config.Logger
 
-func InitService() {
-	model.InitModel()
-	logger = config.GetLogger("controller")
+var models model.IModels
+var fetcher model.Fetcher
+
+var services *Services
+
+func InitService() *Services {
+	logger = config.GetLogger("service")
+	models, fetcher = model.InitModel()
+
+	services = &Services{}
+	return services
 }
