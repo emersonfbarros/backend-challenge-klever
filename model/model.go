@@ -26,11 +26,15 @@ type Models struct{}
 
 var logger *config.Logger
 
-// instantiates APIDataHandler and APIClient structs
+func NewModels() *Models {
+	return &Models{}
+}
+
+// instantiates Models and APIClient structs
 // to use the model layer methods
 func InitModel() (*Models, *APIClient) {
 	logger = config.GetLogger("model")
-	return &Models{}, &APIClient{
+	return NewModels(), &APIClient{
 		BaseURL:  os.Getenv("BASE_URL"),
 		Username: os.Getenv("USERNAME"),
 		Password: os.Getenv("PASSWORD"),
