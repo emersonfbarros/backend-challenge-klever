@@ -19,7 +19,7 @@ func NewServices() *Services {
 	return &Services{}
 }
 
-var logger *config.Logger
+var logger config.ILogger
 var fetcher model.IFetcher
 var services *Services
 

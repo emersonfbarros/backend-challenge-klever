@@ -6,7 +6,7 @@ import (
 	"github.com/emersonfbarros/backend-challenge-klever/service"
 )
 
-var logger *config.Logger
+var logger config.ILogger
 var services service.IServices
 var models model.IModels
 var fetcher model.IFetcher

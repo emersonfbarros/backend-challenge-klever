@@ -7,7 +7,7 @@ import (
 	"github.com/emersonfbarros/backend-challenge-klever/router"
 )
 
-var logger *config.Logger
+var logger config.ILogger
 
 func main() {
 	logger = config.GetLogger("main")

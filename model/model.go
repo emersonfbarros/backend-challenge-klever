@@ -24,8 +24,6 @@ type Fetcher struct {
 
 type Models struct{}
 
-var logger *config.Logger
-
 func NewModels() *Models {
 	return &Models{}
 }
@@ -37,6 +35,8 @@ func NewFetcher() *Fetcher {
 		Password: os.Getenv("PASSWORD"),
 	}
 }
+
+var logger config.ILogger
 
 func InitModel() {
 	logger = config.GetLogger("model")
