@@ -6,17 +6,6 @@ import (
 	"net/http"
 )
 
-// Fetcher interface that defines Fetch method
-type Fetcher interface {
-	Fetch(route string, value string) ([]byte, error)
-}
-
-type APIClient struct {
-	BaseURL  string
-	Username string
-	Password string
-}
-
 // route must be "address", or "utxo", ou "tx"
 func (client *APIClient) Fetch(route string, value string) ([]byte, error) {
 	if route != "address" && route != "utxo" && route != "tx" {
