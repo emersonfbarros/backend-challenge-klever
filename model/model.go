@@ -1,9 +1,14 @@
 package model
 
-import "github.com/emersonfbarros/backend-challenge-klever/config"
+import (
+	"os"
+
+	"github.com/emersonfbarros/backend-challenge-klever/config"
+)
+
 
 var logger *config.Logger
 
 func InitModel() {
-	logger = config.GetLogger("controller")
+	logger = config.GetLogger("model")
 }
