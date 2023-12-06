@@ -10,6 +10,7 @@ type IServices interface {
 	Details(models model.IModels, address string) (*AddressInfo, error)
 	Tx(models model.IModels, txId string) (*Transaction, error)
 	Send(models model.IModels, btcTransactionData *SendBtcConverted) (*UtxoNeeded, error)
+	Health(fetcher model.Fetcher) *HealthRes
 }
 
 type Services struct{}
