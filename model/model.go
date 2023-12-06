@@ -9,6 +9,7 @@ import (
 type DataProcessors interface {
 	Utxo(fetcher Fetcher, address string) (*[]UtxoConverted, error)
 	Address(fetcher Fetcher, address string) (*AddressRes, error)
+	GetTx(fetcher Fetcher, txId string) (*ExtTx, error)
 }
 
 type APIDataHandler struct{}
