@@ -7,5 +7,5 @@ import (
 func Health(context *gin.Context) {
 	health := services.Health(fetcher)
 
-	sendSuccess(context, *health)
+	resSender.sendSuccess(context, *health)
 }
