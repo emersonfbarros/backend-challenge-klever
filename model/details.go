@@ -9,8 +9,8 @@ type AddressRes struct {
 	TotalReceived string `json:"totalReceived"`
 }
 
-func Address(address string) (*AddressRes, error) {
-	body, err := Fetch("address", address)
+func (handler *APIDataHandler) Address(fetcher Fetcher, address string) (*AddressRes, error) {
+	body, err := fetcher.Fetch("address", address)
 	if err != nil {
 		return nil, err
 	}
