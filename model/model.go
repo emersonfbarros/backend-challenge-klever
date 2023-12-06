@@ -30,13 +30,14 @@ func NewModels() *Models {
 	return &Models{}
 }
 
-// instantiates Models and Fetcher structs
-// to use the model layer methods
-func InitModel() (*Models, *Fetcher) {
-	logger = config.GetLogger("model")
-	return NewModels(), &Fetcher{
+func NewFetcher() *Fetcher {
+	return &Fetcher{
 		BaseURL:  os.Getenv("BASE_URL"),
 		Username: os.Getenv("USERNAME"),
 		Password: os.Getenv("PASSWORD"),
 	}
+}
+
+func InitModel() {
+	logger = config.GetLogger("model")
 }

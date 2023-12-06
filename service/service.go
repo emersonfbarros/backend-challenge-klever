@@ -15,16 +15,17 @@ type IServices interface {
 
 type Services struct{}
 
+func NewServices() *Services {
+	return &Services{}
+}
+
 var logger *config.Logger
-
 var fetcher model.IFetcher
-
 var services *Services
 
-func InitService() *Services {
+func InitService() {
 	logger = config.GetLogger("service")
-	_, fetcher = model.InitModel()
-
-	services = &Services{}
-	return services
+	model.InitModel()
+	fetcher = model.NewFetcher()
+	services = NewServices()
 }
