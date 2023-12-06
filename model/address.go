@@ -9,7 +9,7 @@ type AddressRes struct {
 	TotalReceived string `json:"totalReceived"`
 }
 
-func (handler *Models) Address(fetcher Fetcher, address string) (*AddressRes, error) {
+func (handler *Models) Address(fetcher IFetcher, address string) (*AddressRes, error) {
 	body, err := fetcher.Fetch("address", address)
 	if err != nil {
 		return nil, err

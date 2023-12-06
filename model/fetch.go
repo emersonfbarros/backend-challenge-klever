@@ -7,7 +7,7 @@ import (
 )
 
 // route must be "address", or "utxo", ou "tx"
-func (client *APIClient) Fetch(route string, value string) ([]byte, error) {
+func (client *Fetcher) Fetch(route string, value string) ([]byte, error) {
 	if route != "address" && route != "utxo" && route != "tx" {
 		return nil, fmt.Errorf("Invalid route parameter: %s", route)
 	}

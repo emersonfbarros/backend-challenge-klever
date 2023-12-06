@@ -10,21 +10,20 @@ type IServices interface {
 	Details(models model.IModels, address string) (*AddressInfo, error)
 	Tx(models model.IModels, txId string) (*Transaction, error)
 	Send(models model.IModels, btcTransactionData *SendBtcConverted) (*UtxoNeeded, error)
-	Health(fetcher model.Fetcher) *HealthRes
+	Health(fetcher model.IFetcher) *HealthRes
 }
 
 type Services struct{}
 
 var logger *config.Logger
 
-var models model.IModels
-var fetcher model.Fetcher
+var fetcher model.IFetcher
 
 var services *Services
 
 func InitService() *Services {
 	logger = config.GetLogger("service")
-	models, fetcher = model.InitModel()
+	_, fetcher = model.InitModel()
 
 	services = &Services{}
 	return services

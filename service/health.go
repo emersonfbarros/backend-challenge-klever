@@ -23,7 +23,7 @@ type HealthRes struct {
 	ExternalApi ExtApi `json:"externalApi"`
 }
 
-func (s *Services) Health(fetcher model.Fetcher) *HealthRes {
+func (s *Services) Health(fetcher model.IFetcher) *HealthRes {
 	addressTest := os.Getenv("ADDRESS_TEST")
 	txTest := os.Getenv("TX_TEST")
 	successCount := 0
