@@ -17,8 +17,8 @@ type UtxoConverted struct {
 	Confirmations int
 }
 
-func Utxo(address string) (*[]UtxoConverted, error) {
-	body, err := Fetch("utxo", address)
+func (handler *Models) Utxo(fetcher IFetcher, address string) (*[]UtxoConverted, error) {
+	body, err := fetcher.Fetch("utxo", address)
 	if err != nil {
 		return nil, err
 	}

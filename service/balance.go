@@ -12,8 +12,8 @@ type BalanceResult struct {
 	Unconfirmed string `json:"unconfirmed"`
 }
 
-func BalanceCalc(address string) (*BalanceResult, error) {
-	utxoRef, err := model.Utxo(address)
+func (s *Services) BalanceCalc(models model.IModels, address string) (*BalanceResult, error) {
+	utxoRef, err := models.Utxo(fetcher, address)
 	if err != nil {
 		logger.Errorf("failed to unmarshal api response %v", err.Error())
 		return nil, fmt.Errorf("failed to request external resouce")

@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var logger *config.Logger
+var logger config.ILogger
 
 func Initialize(port string) {
 	logger = config.GetLogger("router")

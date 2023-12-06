@@ -1,12 +1,11 @@
 package controller
 
 import (
-	"github.com/emersonfbarros/backend-challenge-klever/service"
 	"github.com/gin-gonic/gin"
 )
 
 func Health(context *gin.Context) {
-	health := service.Health()
+	health := services.Health(fetcher)
 
-	sendSuccess(context, *health)
+	resSender.sendSuccess(context, *health)
 }

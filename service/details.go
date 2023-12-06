@@ -19,7 +19,7 @@ type AddressInfo struct {
 	Total           Total         `json:"total"`
 }
 
-func Details(address string) (*AddressInfo, error) {
+func (s *Services) Details(models model.IModels, address string) (*AddressInfo, error) {
 	var wg sync.WaitGroup
 	wg.Add(2)
 
@@ -30,7 +30,7 @@ func Details(address string) (*AddressInfo, error) {
 	// fetch external api simultaneously
 	go func() {
 		defer wg.Done()
-		balanceRef, errBl = BalanceCalc(address)
+		balanceRef, errBl = services.BalanceCalc(models, address)
 		if errBl != nil {
 			logger.Errorf("failed to unmarshal api response %v", errBl.Error())
 		}
@@ -38,7 +38,7 @@ func Details(address string) (*AddressInfo, error) {
 
 	go func() {
 		defer wg.Done()
-		detailsRef, errDt = model.Address(address)
+		detailsRef, errDt = models.Address(fetcher, address)
 		if errDt != nil {
 			logger.Errorf("failed to unmarshal api response %v", errDt.Error())
 		}

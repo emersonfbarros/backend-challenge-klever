@@ -23,7 +23,7 @@ type HealthRes struct {
 	ExternalApi ExtApi `json:"externalApi"`
 }
 
-func Health() *HealthRes {
+func (s *Services) Health(fetcher model.IFetcher) *HealthRes {
 	addressTest := os.Getenv("ADDRESS_TEST")
 	txTest := os.Getenv("TX_TEST")
 	successCount := 0
@@ -34,7 +34,7 @@ func Health() *HealthRes {
 
 	go func() {
 		defer wg.Done()
-		_, err := model.Fetch("address", addressTest)
+		_, err := fetcher.Fetch("address", addressTest)
 		if err == nil {
 			successCount++
 		}
@@ -42,7 +42,7 @@ func Health() *HealthRes {
 
 	go func() {
 		defer wg.Done()
-		_, err := model.Fetch("utxo", addressTest)
+		_, err := fetcher.Fetch("utxo", addressTest)
 		if err == nil {
 			successCount++
 		}
@@ -50,7 +50,7 @@ func Health() *HealthRes {
 
 	go func() {
 		defer wg.Done()
-		_, err := model.Fetch("tx", txTest)
+		_, err := fetcher.Fetch("tx", txTest)
 		if err == nil {
 			successCount++
 		}

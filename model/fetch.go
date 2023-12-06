@@ -4,30 +4,25 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
 )
 
 // route must be "address", or "utxo", ou "tx"
-func Fetch(route string, value string) ([]byte, error) {
+func (client *Fetcher) Fetch(route string, value string) ([]byte, error) {
 	if route != "address" && route != "utxo" && route != "tx" {
 		return nil, fmt.Errorf("Invalid route parameter: %s", route)
 	}
 
-	baseUrl := os.Getenv("BASE_URL")
-	apiUrl := fmt.Sprintf("%s/%s/%s", baseUrl, route, value)
+	apiUrl := fmt.Sprintf("%s/%s/%s", client.BaseURL, route, value)
 
-	client := &http.Client{}
 	req, err := http.NewRequest("GET", apiUrl, nil)
 	if err != nil {
 		logger.Errorf("failed to create http request %v", err.Error())
 		return nil, err
 	}
 
-	username := os.Getenv("USERNAME")
-	password := os.Getenv("PASSWORD")
-	req.SetBasicAuth(username, password)
+	req.SetBasicAuth(client.Username, client.Password)
 
-	resp, err := client.Do(req)
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		logger.Errorf("failed to make http reques %v", err.Error())
 		return nil, err

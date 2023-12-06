@@ -14,14 +14,14 @@ func Send(context *gin.Context) {
 
 	if err := context.BindJSON(&request); err != nil {
 		logger.Errorf("json bind error: %v", err)
-		sendError(context, http.StatusBadRequest, "'address' and 'amount' must be strings")
+		resSender.sendError(context, http.StatusBadRequest, "'address' and 'amount' must be strings")
 		return
 	}
 
 	// validate request body
 	if err := request.Validate(); err != nil {
 		logger.Errorf("validation error: %v", err.Error())
-		sendError(context, http.StatusBadRequest, err.Error())
+		resSender.sendError(context, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -30,10 +30,10 @@ func Send(context *gin.Context) {
 	btcTransactionData.Amount = new(big.Int)
 	btcTransactionData.Amount.SetString(request.Amount, 10)
 
-	utxos, err := service.Send(&btcTransactionData)
+	utxos, err := services.Send(models, &btcTransactionData)
 	if err != nil {
-		sendError(context, http.StatusBadGateway, err.Error())
+		resSender.sendError(context, http.StatusBadGateway, err.Error())
 	}
 
-	sendSuccess(context, *utxos)
+	resSender.sendSuccess(context, *utxos)
 }
