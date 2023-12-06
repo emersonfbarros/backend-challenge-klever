@@ -6,6 +6,11 @@ import (
 	"os"
 )
 
+type ILogger interface {
+	Infof(format string, args ...interface{})
+	Errorf(format string, args ...interface{})
+}
+
 type Logger struct {
 	info   *log.Logger
 	err    *log.Logger
