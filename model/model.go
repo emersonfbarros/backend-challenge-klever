@@ -10,7 +10,7 @@ type Fetcher interface {
 	Fetch(route string, value string) ([]byte, error)
 }
 
-type DataProcessors interface {
+type IModels interface {
 	Utxo(fetcher Fetcher, address string) (*[]UtxoConverted, error)
 	Address(fetcher Fetcher, address string) (*AddressRes, error)
 	GetTx(fetcher Fetcher, txId string) (*ExtTx, error)
@@ -22,15 +22,15 @@ type APIClient struct {
 	Password string
 }
 
-type APIDataHandler struct{}
+type Models struct{}
 
 var logger *config.Logger
 
 // instantiates APIDataHandler and APIClient structs
 // to use the model layer methods
-func InitModel() (*APIDataHandler, *APIClient) {
+func InitModel() (*Models, *APIClient) {
 	logger = config.GetLogger("model")
-	return &APIDataHandler{}, &APIClient{
+	return &Models{}, &APIClient{
 		BaseURL:  os.Getenv("BASE_URL"),
 		Username: os.Getenv("USERNAME"),
 		Password: os.Getenv("PASSWORD"),

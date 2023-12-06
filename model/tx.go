@@ -18,7 +18,7 @@ type ExtTx struct {
 	BlockHeight int    `json:"blockHeight"`
 }
 
-func (handler *APIDataHandler) GetTx(fetcher Fetcher, txId string) (*ExtTx, error) {
+func (handler *Models) GetTx(fetcher Fetcher, txId string) (*ExtTx, error) {
 	body, err := fetcher.Fetch("tx", txId)
 	if err != nil {
 		return nil, err
