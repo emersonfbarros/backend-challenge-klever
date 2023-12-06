@@ -70,6 +70,7 @@ func TestAddressErrorFetch(t *testing.T) {
 }
 
 func TestAddressErrorUnmarshal(t *testing.T) {
+	// invalid json to unmarshal
 	expectedBytes := []byte("invalid")
 
 	testAddress := "test_address"

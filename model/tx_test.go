@@ -33,7 +33,6 @@ func TestGetTxSuccess(t *testing.T) {
 }
 
 func TestGetTxErrorFetch(t *testing.T) {
-
 	expectedTxBytes, _ := json.Marshal(nil)
 
 	// initialize mock, declared in model/address_test
@@ -53,7 +52,7 @@ func TestGetTxErrorFetch(t *testing.T) {
 }
 
 func TestGetTxErrorUnmarshal(t *testing.T) {
-
+	// invalid json to unmarshal
 	expectedTxBytes := []byte("invalid")
 
 	// initialize mock, declared in model/address_test
