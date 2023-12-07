@@ -38,7 +38,7 @@ func TestBalanceCalcSuccess(t *testing.T) {
 		},
 	}
 
-	expextedBalanceCalcResult := &BalanceResult{
+	expectedBalanceCalcResult := &BalanceResult{
 		Confirmed:   "9715476",
 		Unconfirmed: "97324",
 	}
@@ -52,7 +52,7 @@ func TestBalanceCalcSuccess(t *testing.T) {
 
 	// assertions
 	assert.NoError(t, err)
-	assert.Equal(t, expextedBalanceCalcResult, result)
+	assert.Equal(t, expectedBalanceCalcResult, result)
 
 	mockModels.AssertExpectations(t)
 }
