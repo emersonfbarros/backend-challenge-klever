@@ -24,7 +24,7 @@ func (client *Fetcher) Fetch(route string, value string) ([]byte, error) {
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		logger.Errorf("failed to make http reques %v", err.Error())
+		logger.Errorf("failed to make http request %v", err.Error())
 		return nil, err
 	}
 	defer resp.Body.Close()

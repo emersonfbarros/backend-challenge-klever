@@ -8,7 +8,7 @@ import (
 
 func Details(context *gin.Context) {
 	address := context.Param("address")
-	details, err := services.Details(models, address)
+	details, err := services.Details(services, models, address)
 	if err != nil {
 		resSender.sendError(context, http.StatusBadGateway, err.Error())
 	}

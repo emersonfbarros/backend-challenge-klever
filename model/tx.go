@@ -1,20 +1,22 @@
 package model
 
-import "encoding/json"
+import (
+	"encoding/json"
+)
 
-type vin struct {
+type Vin struct {
 	Addresses []string `json:"addresses"`
 	Value     string   `json:"value"`
 }
 
-type vout struct {
+type Vout struct {
 	Value     string   `json:"value"`
 	Addresses []string `json:"addresses"`
 }
 
 type ExtTx struct {
-	Vin         []vin  `json:"vin"`
-	Vout        []vout `json:"vout"`
+	Vin         []Vin  `json:"vin"`
+	Vout        []Vout `json:"vout"`
 	BlockHeight int    `json:"blockHeight"`
 }
 

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"sync"
 
 	"github.com/emersonfbarros/backend-challenge-klever/model"
@@ -19,7 +20,7 @@ type AddressInfo struct {
 	Total           Total         `json:"total"`
 }
 
-func (s *Services) Details(models model.IModels, address string) (*AddressInfo, error) {
+func (s *Services) Details(services IServices, models model.IModels, address string) (*AddressInfo, error) {
 	var wg sync.WaitGroup
 	wg.Add(2)
 
@@ -31,17 +32,11 @@ func (s *Services) Details(models model.IModels, address string) (*AddressInfo, 
 	go func() {
 		defer wg.Done()
 		balanceRef, errBl = services.BalanceCalc(models, address)
-		if errBl != nil {
-			logger.Errorf("failed to unmarshal api response %v", errBl.Error())
-		}
 	}()
 
 	go func() {
 		defer wg.Done()
 		detailsRef, errDt = models.Address(fetcher, address)
-		if errDt != nil {
-			logger.Errorf("failed to unmarshal api response %v", errDt.Error())
-		}
 	}()
 
 	// wait for both requests to complete
@@ -49,6 +44,7 @@ func (s *Services) Details(models model.IModels, address string) (*AddressInfo, 
 
 	if errBl != nil || errDt != nil {
 		logger.Errorf("failed to request address or utxo")
+		return nil, fmt.Errorf("failed to request external resource")
 	}
 
 	detailsPartial := *detailsRef

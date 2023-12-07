@@ -21,7 +21,7 @@ func (s *Services) Tx(models model.IModels, txId string) (*Transaction, error) {
 	txRef, err := models.GetTx(fetcher, txId)
 	if err != nil {
 		logger.Errorf("failed to unmarshal api response %v", err.Error())
-		return nil, fmt.Errorf("failed to request external resouce")
+		return nil, fmt.Errorf("failed to request external resource")
 	}
 
 	extTx := *txRef
