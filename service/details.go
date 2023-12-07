@@ -19,7 +19,7 @@ type AddressInfo struct {
 	Total           Total         `json:"total"`
 }
 
-func (s *Services) Details(models model.IModels, address string) (*AddressInfo, error) {
+func (s *Services) Details(services IServices, models model.IModels, address string) (*AddressInfo, error) {
 	var wg sync.WaitGroup
 	wg.Add(2)
 
