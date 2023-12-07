@@ -11,7 +11,8 @@ func Details(context *gin.Context) {
 	details, err := services.Details(services, models, address)
 	if err != nil {
 		resSender.sendError(context, http.StatusBadGateway, err.Error())
+		return
 	}
 
-	resSender.sendSuccess(context, *details)
+	resSender.sendSuccess(context, details)
 }

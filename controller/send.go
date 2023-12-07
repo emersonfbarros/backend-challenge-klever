@@ -33,7 +33,8 @@ func Send(context *gin.Context) {
 	utxos, err := services.Send(models, &btcTransactionData)
 	if err != nil {
 		resSender.sendError(context, http.StatusBadGateway, err.Error())
+		return
 	}
 
-	resSender.sendSuccess(context, *utxos)
+	resSender.sendSuccess(context, utxos)
 }

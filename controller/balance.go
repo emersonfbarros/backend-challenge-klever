@@ -12,7 +12,8 @@ func Balance(context *gin.Context) {
 	balance, err := services.BalanceCalc(models, address)
 	if err != nil {
 		resSender.sendError(context, http.StatusBadGateway, err.Error())
+		return
 	}
 
-	resSender.sendSuccess(context, *balance)
+	resSender.sendSuccess(context, balance)
 }
