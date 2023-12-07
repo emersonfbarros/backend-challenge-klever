@@ -42,6 +42,7 @@ func TestHealthSuccess(t *testing.T) {
 	assert.NotEmpty(t, result.Uptime)
 	assert.NotEmpty(t, result.ExternalApi.Status)
 	assert.NotEmpty(t, result.ExternalApi.ResponseTime)
+	assert.Equal(t, result.ExternalApi.Status, "Ok")
 
 	mockFetcher.AssertCalled(t, "Fetch", "address", "mock_address")
 	mockFetcher.AssertCalled(t, "Fetch", "utxo", "mock_address")
@@ -75,6 +76,7 @@ func TestHealthPartialSuccess(t *testing.T) {
 	assert.NotEmpty(t, result.Uptime)
 	assert.NotEmpty(t, result.ExternalApi.Status)
 	assert.NotEmpty(t, result.ExternalApi.ResponseTime)
+	assert.Equal(t, result.ExternalApi.Status, "Partially Ok")
 
 	mockFetcher.AssertCalled(t, "Fetch", "address", "mock_address")
 	mockFetcher.AssertCalled(t, "Fetch", "utxo", "mock_address")
@@ -108,6 +110,7 @@ func TestHealthExternalApiDown(t *testing.T) {
 	assert.NotEmpty(t, result.Uptime)
 	assert.NotEmpty(t, result.ExternalApi.Status)
 	assert.NotEmpty(t, result.ExternalApi.ResponseTime)
+	assert.Equal(t, result.ExternalApi.Status, "Down")
 
 	mockFetcher.AssertCalled(t, "Fetch", "address", "mock_address")
 	mockFetcher.AssertCalled(t, "Fetch", "utxo", "mock_address")
