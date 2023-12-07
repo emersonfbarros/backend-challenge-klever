@@ -21,11 +21,9 @@ func NewServices() *Services {
 
 var logger config.ILogger
 var fetcher model.IFetcher
-var services *Services
 
 func InitService() {
 	logger = config.GetLogger("service")
 	model.InitModel()
 	fetcher = model.NewFetcher()
-	services = NewServices()
 }
