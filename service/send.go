@@ -32,7 +32,7 @@ func (s *Services) Send(models model.IModels, btcTransactionData *SendBtcConvert
 	// sort utxo slice in descending order
 	utxoSlice := *utxoRef
 	sort.Slice(utxoSlice, func(i, j int) bool {
-		return utxoSlice[i].Value.Cmp(utxoSlice[j].Value) < 0
+		return utxoSlice[i].Value.Cmp(utxoSlice[j].Value) > 0
 	})
 
 	var utxosNeeded UtxoNeeded
