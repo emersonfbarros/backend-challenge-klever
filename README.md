@@ -15,7 +15,7 @@
 
 ## Introduction
 
-Restful API created with [Go](https://go.dev/) and the [Gin](https://gin-gonic.com/) framework to show useful information about bitcoin addresses and transactions, as well as calculate utxos needed to make a transaction.
+Restful API created with [Go](https://go.dev/) and the [Gin](https://gin-gonic.com/) framework that implements some functions of a bitcoin wallet. 
 ## Getting Started
 
 **Prerequisites:**
@@ -149,6 +149,8 @@ _Response:_
 
 
 ## Testing
+
+The tests were created with built-in Go packages and the [testify](https://github.com/stretchr/testify) toolkit.
 
 To run the tests implemented so far, at the root of the project run:
 
