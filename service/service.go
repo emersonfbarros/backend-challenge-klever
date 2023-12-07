@@ -24,6 +24,5 @@ var fetcher model.IFetcher
 
 func InitService() {
 	logger = config.GetLogger("service")
-	model.InitModel()
 	fetcher = model.NewFetcher()
 }

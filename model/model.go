@@ -20,6 +20,7 @@ type Fetcher struct {
 	BaseURL  string
 	Username string
 	Password string
+	logger   config.ILogger
 }
 
 type Models struct{}
@@ -33,11 +34,6 @@ func NewFetcher() *Fetcher {
 		BaseURL:  os.Getenv("BASE_URL"),
 		Username: os.Getenv("USERNAME"),
 		Password: os.Getenv("PASSWORD"),
+		logger:   config.GetLogger("model"),
 	}
-}
-
-var logger config.ILogger
-
-func InitModel() {
-	logger = config.GetLogger("model")
 }

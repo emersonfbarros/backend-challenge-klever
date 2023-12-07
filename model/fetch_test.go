@@ -101,6 +101,7 @@ func TestFetchSuccess(t *testing.T) {
 				BaseURL:  os.Getenv("BASE_URL"),
 				Username: os.Getenv("USERNAME"),
 				Password: os.Getenv("PASSWORD"),
+				// logger:   config.GetLogger("test"),
 			}
 
 			got, err := fetcher.Fetch(tt.args.route, tt.args.value)
@@ -128,13 +129,7 @@ func (m *MockLogger) Errorf(format string, args ...interface{}) {
 }
 
 func TestFetchHttpRequestError(t *testing.T) {
-	InitModel()
-	originalLogger := logger // keeps orginal logger saved
 	mockLogger := new(MockLogger)
-	logger = mockLogger // replaces original with mock
-	defer func() {
-		logger = originalLogger // restores the original logger after test
-	}()
 
 	// Create a mock server
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {}))
@@ -148,6 +143,7 @@ func TestFetchHttpRequestError(t *testing.T) {
 		BaseURL:  os.Getenv("BASE_URL"),
 		Username: os.Getenv("USERNAME"),
 		Password: os.Getenv("PASSWORD"),
+		logger:   mockLogger,
 	}
 
 	mockLogger.On("Errorf", mock.Anything, mock.Anything).Return()
