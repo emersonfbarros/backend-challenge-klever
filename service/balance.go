@@ -16,7 +16,7 @@ func (s *Services) BalanceCalc(models model.IModels, address string) (*BalanceRe
 	utxoRef, err := models.Utxo(fetcher, address)
 	if err != nil {
 		logger.Errorf("failed to unmarshal api response %v", err.Error())
-		return nil, fmt.Errorf("failed to request external resouce")
+		return nil, fmt.Errorf("failed to request external resource")
 	}
 
 	utxoSlice := *utxoRef
