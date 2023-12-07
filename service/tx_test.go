@@ -29,6 +29,19 @@ func (m *MockIModels) Address(fetcher model.IFetcher, address string) (*model.Ad
 	return args.Get(0).(*model.AddressRes), args.Error(1)
 }
 
+// mock custom logger
+type MockLogger struct {
+	mock.Mock
+}
+
+func (m *MockLogger) Infof(format string, args ...interface{}) {
+	m.Called(format, args)
+}
+
+func (m *MockLogger) Errorf(format string, args ...interface{}) {
+	m.Called(format, args)
+}
+
 func TestTxSuccess(t *testing.T) {
 	modelsMock := new(MockIModels)
 
@@ -66,18 +79,6 @@ func TestTxSuccess(t *testing.T) {
 	assert.Equal(t, "90311", result.Addresses[3].Value)
 
 	modelsMock.AssertExpectations(t)
-}
-
-type MockLogger struct {
-	mock.Mock
-}
-
-func (m *MockLogger) Infof(format string, args ...interface{}) {
-	m.Called(format, args)
-}
-
-func (m *MockLogger) Errorf(format string, args ...interface{}) {
-	m.Called(format, args)
 }
 
 func TestTxError(t *testing.T) {
