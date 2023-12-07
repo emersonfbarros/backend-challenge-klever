@@ -2,7 +2,6 @@ package model
 
 import (
 	"encoding/json"
-	"fmt"
 )
 
 type Vin struct {
@@ -31,8 +30,6 @@ func (handler *Models) GetTx(fetcher IFetcher, txId string) (*ExtTx, error) {
 	if err := json.Unmarshal(body, &extTx); err != nil {
 		return nil, err
 	}
-
-	fmt.Printf("\n%+v\n", extTx)
 
 	return &extTx, nil
 }
