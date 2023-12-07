@@ -10,8 +10,8 @@ import (
 
 func TestGetTxSuccess(t *testing.T) {
 	expectedTx := ExtTx{
-		Vin:         []vin{{Addresses: []string{"address1"}, Value: "100"}},
-		Vout:        []vout{{Value: "100", Addresses: []string{"address2"}}},
+		Vin:         []Vin{{Addresses: []string{"address1"}, Value: "100"}},
+		Vout:        []Vout{{Value: "100", Addresses: []string{"address2"}}},
 		BlockHeight: 123,
 	}
 	expectedTxBytes, _ := json.Marshal(expectedTx)
