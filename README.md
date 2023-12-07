@@ -24,6 +24,14 @@ Restful API created with [Go](https://go.dev/) and the [Gin](https://gin-gonic.c
 - Create a valid .env file following the .env.example template that is in the root of the project;
 - Ensure that no application is listening on port :8080.
 
+**Preparing the environment:**
+
+Before running locally, run the command below to ensure that all dependencies will be installed:
+
+```shell
+go mod tidy
+```
+
 **Running the API without build:**
 
 At the root of the project, run the command 
