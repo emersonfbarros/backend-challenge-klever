@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"sync"
 
 	"github.com/emersonfbarros/backend-challenge-klever/model"
@@ -31,17 +32,11 @@ func (s *Services) Details(services IServices, models model.IModels, address str
 	go func() {
 		defer wg.Done()
 		balanceRef, errBl = services.BalanceCalc(models, address)
-		if errBl != nil {
-			logger.Errorf("failed to unmarshal api response %v", errBl.Error())
-		}
 	}()
 
 	go func() {
 		defer wg.Done()
 		detailsRef, errDt = models.Address(fetcher, address)
-		if errDt != nil {
-			logger.Errorf("failed to unmarshal api response %v", errDt.Error())
-		}
 	}()
 
 	// wait for both requests to complete
@@ -49,6 +44,7 @@ func (s *Services) Details(services IServices, models model.IModels, address str
 
 	if errBl != nil || errDt != nil {
 		logger.Errorf("failed to request address or utxo")
+		return nil, fmt.Errorf("failed to request external resource")
 	}
 
 	detailsPartial := *detailsRef
