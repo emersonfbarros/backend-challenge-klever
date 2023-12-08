@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestBalanceRoute(t *testing.T) {
+func TestBalanceRouteSuccess(t *testing.T) {
 	serverRes := `[
 		{
 			"txid": "1c16ffaad93464a35af0501b95274fe08e2f68beeadc1599cda14f2fb612f1b6",
@@ -61,4 +61,34 @@ func TestBalanceRoute(t *testing.T) {
 	// assertions
 	assert.Equal(t, http.StatusOK, resp.Code)
 	assert.Equal(t, `{"confirmed":"705425","unconfirmed":"0"}`, resp.Body.String())
+}
+
+func TestBalanceRouteError(t *testing.T) {
+	serverRes := `{ "message": "Not found" }`
+
+	// http server to mock exeternal api
+	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte(serverRes)) // returns expected body
+	}))
+
+	defer testServer.Close()
+
+	os.Setenv("BASE_URL", testServer.URL)
+
+	// initiali application server
+	srv := Initialize(":8080")
+	// shutdown server when test finishes
+	defer srv.Shutdown(context.Background())
+
+	// creates requesto for balance route
+	req, _ := http.NewRequest(http.MethodGet, "/api/v1/balance/not_found_address", nil)
+	resp := httptest.NewRecorder()
+
+	// handles request
+	srv.Handler.(*gin.Engine).ServeHTTP(resp, req)
+
+	// assertions
+	assert.Equal(t, http.StatusBadGateway, resp.Code)
+	assert.Equal(t, `{"message":"failed to request external resource"}`, resp.Body.String())
 }
