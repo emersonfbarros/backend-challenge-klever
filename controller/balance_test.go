@@ -8,7 +8,6 @@ import (
 
 	"github.com/emersonfbarros/backend-challenge-klever/service"
 	"github.com/gin-gonic/gin"
-	"github.com/stretchr/testify/mock"
 )
 
 func TestBalanceSuccess(t *testing.T) {
@@ -22,13 +21,14 @@ func TestBalanceSuccess(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	context, _ := gin.CreateTestContext(w)
+	context.Params = append(context.Params, gin.Param{Key: "address", Value: "valid_address"})
 
 	balanceResult := &service.BalanceResult{
 		Confirmed:   "38675889",
 		Unconfirmed: "8527",
 	}
 
-	s.On("BalanceCalc", m, mock.Anything).Return(balanceResult, nil).Once()
+	s.On("BalanceCalc", m, "valid_address").Return(balanceResult, nil).Once()
 
 	r.On("sendSuccess", context, balanceResult).Once()
 
@@ -49,13 +49,14 @@ func TestBalanceError(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	context, _ := gin.CreateTestContext(w)
+	context.Params = append(context.Params, gin.Param{Key: "address", Value: "valid_address"})
 
 	balanceResult := &service.BalanceResult{
 		Confirmed:   "nil",
 		Unconfirmed: "nil",
 	}
 
-	s.On("BalanceCalc", m, mock.Anything).Return(balanceResult, errors.New("failed to get balance")).Once()
+	s.On("BalanceCalc", m, "valid_address").Return(balanceResult, errors.New("failed to get balance")).Once()
 
 	r.On("sendError", context, http.StatusBadGateway, "failed to get balance").Once()
 
