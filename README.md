@@ -63,7 +63,7 @@ make run
 
 This project includes a `Dockerfile` and `docker-compose.yml` file for easy containerization and deployment.
 
-**Running application with Docker*:*
+**Running application with Docker:**
 
 At the root of the project:
 
