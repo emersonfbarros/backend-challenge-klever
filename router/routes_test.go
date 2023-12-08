@@ -11,8 +11,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestBalanceRouteSuccess(t *testing.T) {
-	serverRes := `[
+func TestRoutesIntegration(t *testing.T) {
+	utxoRes := `[
 		{
 			"txid": "1c16ffaad93464a35af0501b95274fe08e2f68beeadc1599cda14f2fb612f1b6",
 			"vout": 119,
@@ -36,59 +36,61 @@ func TestBalanceRouteSuccess(t *testing.T) {
 		}
 	]`
 
-	// http server to mock exeternal api
-	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(serverRes)) // returns expected body
-	}))
+	t.Run("Test balance route on success", func(t *testing.T) {
+		// http server to mock exeternal api
+		testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(utxoRes)) // returns expected body
+		}))
 
-	defer testServer.Close()
+		defer testServer.Close()
 
-	os.Setenv("BASE_URL", testServer.URL)
+		os.Setenv("BASE_URL", testServer.URL)
 
-	// initiali application server
-	srv := Initialize(":8080")
-	// shutdown server when test finishes
-	defer srv.Shutdown(context.Background())
+		// initiali application server
+		srv := Initialize(":8080")
+		// shutdown server when test finishes
+		defer srv.Shutdown(context.Background())
 
-	// creates requesto for balance route
-	req, _ := http.NewRequest(http.MethodGet, "/api/v1/balance/v9waeg80qeg", nil)
-	resp := httptest.NewRecorder()
+		// creates requesto for balance route
+		req, _ := http.NewRequest(http.MethodGet, "/api/v1/balance/v9waeg80qeg", nil)
+		resp := httptest.NewRecorder()
 
-	// handles request
-	srv.Handler.(*gin.Engine).ServeHTTP(resp, req)
+		// handles request
+		srv.Handler.(*gin.Engine).ServeHTTP(resp, req)
 
-	// assertions
-	assert.Equal(t, http.StatusOK, resp.Code)
-	assert.Equal(t, `{"confirmed":"705425","unconfirmed":"0"}`, resp.Body.String())
-}
+		// assertions
+		assert.Equal(t, http.StatusOK, resp.Code)
+		assert.Equal(t, `{"confirmed":"705425","unconfirmed":"0"}`, resp.Body.String())
+	})
 
-func TestBalanceRouteError(t *testing.T) {
-	serverRes := `{ "message": "Not found" }`
+	t.Run("Test balance route on error", func(t *testing.T) {
+		serverRes := `{ "message": "Not found" }`
 
-	// http server to mock exeternal api
-	testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte(serverRes)) // returns expected body
-	}))
+		// http server to mock exeternal api
+		testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusNotFound)
+			w.Write([]byte(serverRes)) // returns expected body
+		}))
 
-	defer testServer.Close()
+		defer testServer.Close()
 
-	os.Setenv("BASE_URL", testServer.URL)
+		os.Setenv("BASE_URL", testServer.URL)
 
-	// initiali application server
-	srv := Initialize(":8080")
-	// shutdown server when test finishes
-	defer srv.Shutdown(context.Background())
+		// initiali application server
+		srv := Initialize(":8080")
+		// shutdown server when test finishes
+		defer srv.Shutdown(context.Background())
 
-	// creates requesto for balance route
-	req, _ := http.NewRequest(http.MethodGet, "/api/v1/balance/not_found_address", nil)
-	resp := httptest.NewRecorder()
+		// creates requesto for balance route
+		req, _ := http.NewRequest(http.MethodGet, "/api/v1/balance/not_found_address", nil)
+		resp := httptest.NewRecorder()
 
-	// handles request
-	srv.Handler.(*gin.Engine).ServeHTTP(resp, req)
+		// handles request
+		srv.Handler.(*gin.Engine).ServeHTTP(resp, req)
 
-	// assertions
-	assert.Equal(t, http.StatusBadGateway, resp.Code)
-	assert.Equal(t, `{"message":"failed to request external resource"}`, resp.Body.String())
+		// assertions
+		assert.Equal(t, http.StatusBadGateway, resp.Code)
+		assert.Equal(t, `{"message":"failed to request external resource"}`, resp.Body.String())
+	})
 }
