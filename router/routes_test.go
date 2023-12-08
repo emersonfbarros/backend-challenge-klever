@@ -47,16 +47,16 @@ func TestRoutesIntegration(t *testing.T) {
 		"vout": [
 			{
 				"value": "623579",
-				"addresses": ["36iYTpBFVZPbcyUs8pj3BtutZXzN6HPNA6"],
+				"addresses": ["36iYTpBFVZPbcyUs8pj3BtutZXzN6HPNA6"]
 			},
 			{
 				"value": "3283266",
-				"addresses": ["bc1qe29ydjtwyjdmffxg4qwtd5wfwzdxvnap989glq"],
+				"addresses": ["bc1qe29ydjtwyjdmffxg4qwtd5wfwzdxvnap989glq"]
 			},
 			{
 				"value": "90311",
-				"addresses": ["bc1qanhueax8r4cn52r38f2h727mmgg6hm3xjlwd0x"],
-			},
+				"addresses": ["bc1qanhueax8r4cn52r38f2h727mmgg6hm3xjlwd0x"]
+			}
 		],
 		"blockHeight": 675674
 	}`
@@ -95,6 +95,20 @@ func TestRoutesIntegration(t *testing.T) {
 			expectedBody: `{"address":"19SH3YrkrpWXKtCoMXWfoVpmUF1ZHAi24n","balance":"17454817","totalTx":647,"balanceCalc":{"confirmed":"705425","unconfirmed":"0"},"total":{"sent":"176043318","received":"193498135"}}`,
 			expectedCode: http.StatusOK,
 		},
+		{
+			name:         "Test details route on error",
+			address:      "1v4lid_4ddre55",
+			route:        "details/",
+			expectedBody: notFoundRes,
+			expectedCode: http.StatusBadGateway,
+		},
+		{
+			name:         "Test tx route on success",
+			tx:           tx,
+			route:        "tx/",
+			expectedBody: `{"addresses":[{"address":"bc1qyzxdu4px4jy8gwhcj82zpv7qzhvc0fvumgnh0r","value":"484817655"},{"address":"36iYTpBFVZPbcyUs8pj3BtutZXzN6HPNA6","value":"623579"},{"address":"bc1qe29ydjtwyjdmffxg4qwtd5wfwzdxvnap989glq","value":"3283266"},{"address":"bc1qanhueax8r4cn52r38f2h727mmgg6hm3xjlwd0x","value":"90311"}],"block":675674,"txID":"3654d26660dcc05d4cfb25a1641a1e61f06dfeb38ee2279bdb049d018f1830ab"}`,
+			expectedCode: http.StatusOK,
+		},
 	}
 
 	for _, tt := range tests {
@@ -126,8 +140,14 @@ func TestRoutesIntegration(t *testing.T) {
 			// shutdown server when test finishes
 			defer srv.Shutdown(context.Background())
 
-			// creates requesto for balance route
-			req, _ := http.NewRequest(http.MethodGet, "/api/v1/"+tt.route+tt.address, nil)
+			var routeValue string
+			if tt.route == "tx/" {
+				routeValue = tt.tx
+			} else {
+				routeValue = tt.address
+			}
+			// creates request for balance route
+			req, _ := http.NewRequest(http.MethodGet, "/api/v1/"+tt.route+routeValue, nil)
 			resp := httptest.NewRecorder()
 
 			// handles request
