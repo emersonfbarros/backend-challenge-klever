@@ -21,5 +21,10 @@ test:
 test-verbose:
 	@go test -v $(TEST)
 
+# tests coverage
+test-coverage:
+	@go test -v $(TEST) -coverprofile=cover.out
+
+# removes app build
 clean:
 	@rm -f $(BINARY_NAME)
