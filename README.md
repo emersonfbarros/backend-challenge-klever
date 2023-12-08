@@ -2,7 +2,7 @@
 
 **Warning:** This project is a work in progress. There are tasks to complete so that all challenge requirements are met. But the application itself is already complete and working. 
 
-- Some unit and integration tests still need to be created. 
+- Some integration tests still need to be created. 
 - A Makefile will be added for build and deployment automation.
 - Instructions for starting the application via a Docker container will be provided.
 
@@ -55,7 +55,11 @@ The base url will be: `http://localhost:8080/api/v1`
 
 **Health** [GET]: `/health`
 
+Try with curl: `curl -svX GET 'http://localhost:8080/api/v1/health'`
+
 _Response:_
+
+External API response time is calculated by making three simultaneous calls to the external api using goroutines.
 
 ```json
 {
@@ -69,13 +73,11 @@ _Response:_
 }
 ```
 
-Try with curl: `curl -svX GET 'http://localhost:8080/api/v1/health'`
-
-External API response time is calculated by making three simultaneous calls to the external api using goroutines.
-
 **Details** [GET]: `/details/19SH3YrkrpWXKtCoMXWfoVpmUF1ZHAi24n`
 
 _Response:_
+
+Try with curl: `curl -svX GET 'http://localhost:8080/api/v1/details/19SH3YrkrpWXKtCoMXWfoVpmUF1ZHAi24n'`
 
 ```json
 {
@@ -93,9 +95,9 @@ _Response:_
 }
 ```
 
-Try with curl: `curl -svX GET 'http://localhost:8080/api/v1/details/19SH3YrkrpWXKtCoMXWfoVpmUF1ZHAi24n'`
-
 **Balance** [GET]: `/balance/19SH3YrkrpWXKtCoMXWfoVpmUF1ZHAi24n`
+
+Try with curl: `curl -svX GET 'http://localhost:8080/api/v1/balance/19SH3YrkrpWXKtCoMXWfoVpmUF1ZHAi24n'`
 
 _Response:_
 
@@ -106,9 +108,9 @@ _Response:_
 }
 ```
 
-Try with curl: `curl -svX GET 'http://localhost:8080/api/v1/balance/19SH3YrkrpWXKtCoMXWfoVpmUF1ZHAi24n'`
-
 **Send** [POST]: `/send`
+
+Try with curl: `curl -svX POST "http://localhost:8080/api/v1/send" -H 'Content-Type: application/json' -d '{"address": "19SH3YrkrpWXKtCoMXWfoVpmUF1ZHAi24n", "amount": "1208053"}'`
 
 _Response:_
 
@@ -127,11 +129,11 @@ _Response:_
 }
 ```
 
-Try with curl: `curl -svX POST "http://localhost:8080/api/v1/send" -H 'Content-Type: application/json' -d '{"address": "19SH3YrkrpWXKtCoMXWfoVpmUF1ZHAi24n", "amount": "1208053"}'`
-
 **Transaction** [GET]: `/tx/3654d26660dcc05d4cfb25a1641a1e61f06dfeb38ee2279bdb049d018f1830ab`
 
 _Response:_
+
+Try with curl `curl -svX GET 'http://localhost:8080/api/v1/tx/3654d26660dcc05d4cfb25a1641a1e61f06dfeb38ee2279bdb049d018f1830ab'`
 
 ```json
 {
@@ -155,7 +157,6 @@ _Response:_
 }
 ```
 
-Try with curl `curl -svX GET 'http://localhost:8080/api/v1/tx/3654d26660dcc05d4cfb25a1641a1e61f06dfeb38ee2279bdb049d018f1830ab'`
 
 ## Testing
 
