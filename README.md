@@ -29,7 +29,7 @@ Restful API created with [Go](https://go.dev/) and the [Gin](https://gin-gonic.c
 Before running locally, run the command below to ensure that all dependencies will be installed:
 
 ```shell
-go mod tidy
+go mod download
 ```
 
 **Running the API without build:**
