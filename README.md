@@ -51,6 +51,7 @@ The project includes a Makefile to help you manage common tasks more easily. Her
 - `make release`: Run the application in gin release mode.
 - `make test`: Run tests for all packages in the project.
 - `make test-verbose`: Run tests for all packages in the project in verbose mode.
+- `make test-coverage`: Runs tests for all packages and shows coverage.
 - `make clean`: Remove the `gowallet` executable.
 
 To use these commands, simply type `make` followed by the desired command in your terminal. For example:
@@ -207,4 +208,10 @@ For a more verbose result:
 
 ```shell
 go test -v ./...
+```
+
+To see test coverage:
+
+```shell
+go test -v ./... -coverprofile=cover.out
 ```
