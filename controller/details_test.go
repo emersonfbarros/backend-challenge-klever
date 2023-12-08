@@ -10,7 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func TestBalanceSuccess(t *testing.T) {
+func TestDetailsSuccess(t *testing.T) {
 	InitController()
 	s := new(MockServices) // implemented in controler/tx_test
 	services = s
@@ -23,22 +23,31 @@ func TestBalanceSuccess(t *testing.T) {
 	context, _ := gin.CreateTestContext(w)
 	context.Params = append(context.Params, gin.Param{Key: "address", Value: "valid_address"})
 
-	balanceResult := &service.BalanceResult{
-		Confirmed:   "38675889",
-		Unconfirmed: "8527",
+	detailsResult := &service.AddressInfo{
+		Address:         "valid_address",
+		BalanceExternal: "38675889",
+		TotalTx:         31,
+		Balance: service.BalanceResult{
+			Confirmed:   "38675889",
+			Unconfirmed: "8527",
+		},
+		Total: service.Total{
+			Sent:     "38675889",
+			Received: "38675889",
+		},
 	}
 
-	s.On("BalanceCalc", m, "valid_address").Return(balanceResult, nil).Once()
+	s.On("Details", s, m, "valid_address").Return(detailsResult, nil).Once()
 
-	r.On("sendSuccess", context, balanceResult).Once()
+	r.On("sendSuccess", context, detailsResult).Once()
 
-	Balance(context)
+	Details(context)
 
 	s.AssertExpectations(t)
 	r.AssertExpectations(t)
 }
 
-func TestBalanceError(t *testing.T) {
+func TestDetailsError(t *testing.T) {
 	InitController()
 	s := new(MockServices) // implemented in controler/tx_test
 	services = s
@@ -51,16 +60,25 @@ func TestBalanceError(t *testing.T) {
 	context, _ := gin.CreateTestContext(w)
 	context.Params = append(context.Params, gin.Param{Key: "address", Value: "valid_address"})
 
-	balanceResult := &service.BalanceResult{
-		Confirmed:   "nil",
-		Unconfirmed: "nil",
+	detailsResult := &service.AddressInfo{
+		Address:         "nil",
+		BalanceExternal: "nil",
+		TotalTx:         0,
+		Balance: service.BalanceResult{
+			Confirmed:   "nil",
+			Unconfirmed: "nil",
+		},
+		Total: service.Total{
+			Sent:     "nil",
+			Received: "nil",
+		},
 	}
 
-	s.On("BalanceCalc", m, "valid_address").Return(balanceResult, errors.New("failed to get balance")).Once()
+	s.On("Details", s, m, "valid_address").Return(detailsResult, errors.New("failed to get details")).Once()
 
-	r.On("sendError", context, http.StatusBadGateway, "failed to get balance").Once()
+	r.On("sendError", context, http.StatusBadGateway, "failed to get details").Once()
 
-	Balance(context)
+	Details(context)
 
 	s.AssertExpectations(t)
 	r.AssertExpectations(t)
