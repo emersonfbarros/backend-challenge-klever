@@ -17,11 +17,11 @@ type Address struct {
 	Value   string `json:"value"`
 }
 
-func (s *Services) Tx(models model.IModels, txId string) (*Transaction, error) {
-	txRef, err := models.GetTx(fetcher, txId)
+func (s *Services) Tx(models model.IModels, txId string) (*Transaction, error, int) {
+	txRef, err, httpCode := models.GetTx(fetcher, txId)
 	if err != nil {
-		logger.Errorf("failed to unmarshal api response %v", err.Error())
-		return nil, fmt.Errorf("failed to request external resource")
+		logger.Errorf("%v", err.Error())
+		return nil, fmt.Errorf("%s", err.Error()), httpCode
 	}
 
 	extTx := *txRef
@@ -45,5 +45,5 @@ func (s *Services) Tx(models model.IModels, txId string) (*Transaction, error) {
 		})
 	}
 
-	return &transaction, nil
+	return &transaction, nil, 0
 }
