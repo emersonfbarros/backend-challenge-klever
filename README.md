@@ -3,8 +3,6 @@
 **Warning:** This project is a work in progress. There are tasks to complete so that all challenge requirements are met. But the application itself is already complete and working. 
 
 - Some integration tests still need to be created. 
-- A Makefile will be added for build and deployment automation.
-- Instructions for starting the application via a Docker container will be provided.
 
 ## Table of Contents
 
