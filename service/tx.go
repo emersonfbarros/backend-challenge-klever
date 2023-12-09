@@ -20,7 +20,6 @@ type Address struct {
 func (s *Services) Tx(models model.IModels, txId string) (*Transaction, error, int) {
 	txRef, err, httpCode := models.GetTx(fetcher, txId)
 	if err != nil {
-		logger.Errorf("%v", err.Error())
 		return nil, fmt.Errorf("%s", err.Error()), httpCode
 	}
 
