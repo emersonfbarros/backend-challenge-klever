@@ -22,7 +22,7 @@ type UtxoConverted struct {
 func (handler *Models) Utxo(fetcher IFetcher, address string) (*[]UtxoConverted, error, int) {
 	body, err := fetcher.Fetch("utxo", address)
 	if err != nil {
-		return nil, err, http.StatusBadGateway
+		return nil, fmt.Errorf("Failed to request external resource"), http.StatusBadGateway
 	}
 
 	var bodyVerification struct {
@@ -36,7 +36,7 @@ func (handler *Models) Utxo(fetcher IFetcher, address string) (*[]UtxoConverted,
 
 	var utxoRes []UtxoRes
 	if err := json.Unmarshal(body, &utxoRes); err != nil {
-		return nil, err, http.StatusInternalServerError
+		return nil, fmt.Errorf("Internal server error"), http.StatusInternalServerError
 	}
 
 	var utxoConverted []UtxoConverted
