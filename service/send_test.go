@@ -52,7 +52,7 @@ func TestSendSuccess(t *testing.T) {
 
 	// config mocks
 	mockModels.On("Utxo", mock.Anything, "mocked_address").
-		Return(&mockedUtxoConverted, nil)
+		Return(&mockedUtxoConverted, nil, 0)
 
 	// mock param
 	btcTransaction := &SendBtcConverted{
@@ -61,11 +61,12 @@ func TestSendSuccess(t *testing.T) {
 	}
 
 	service := &Services{}
-	result, err := service.Send(mockModels, btcTransaction)
+	result, err, httpCode := service.Send(mockModels, btcTransaction)
 
 	// assertions
 	assert.NoError(t, err)
 	assert.Equal(t, expectedSendResult, result)
+	assert.Equal(t, 0, httpCode)
 
 	mockModels.AssertExpectations(t)
 }

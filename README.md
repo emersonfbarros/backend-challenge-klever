@@ -191,6 +191,7 @@ Try with curl `curl -svX GET 'http://localhost:8080/api/v1/tx/3654d26660dcc05d4c
 }
 ```
 
+Try with curl `curl -svX GET 'http://localhost:8080/api/v1/tx/3654d26660dcc05d4cfb25a1641a1e61f06dfeb38ee2279bdb049d018f1830ab'`
 
 ## Testing
 

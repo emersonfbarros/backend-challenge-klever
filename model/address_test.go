@@ -3,6 +3,7 @@ package model
 import (
 	"encoding/json"
 	"errors"
+	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -38,12 +39,13 @@ func TestAddressSuccess(t *testing.T) {
 	mockFetcher.On("Fetch", "address", testAddress).Return(expectedBytes, nil)
 
 	// calls method
-	result, err := models.Address(mockFetcher, testAddress)
+	result, err, httpCode := models.Address(mockFetcher, testAddress)
 
 	// assertions
 	assert.NoError(t, err)
 	assert.NotNil(t, result)
 	assert.Equal(t, testResponse, result)
+	assert.Equal(t, 0, httpCode)
 
 	mockFetcher.AssertExpectations(t)
 }
@@ -60,11 +62,12 @@ func TestAddressErrorFetch(t *testing.T) {
 	mockFetcher.On("Fetch", "address", testAddress).Return(expectedBytes, errors.New("fetch error"))
 
 	// calls method
-	result, err := models.Address(mockFetcher, testAddress)
+	result, err, httpCode := models.Address(mockFetcher, testAddress)
 
 	// assertions
 	assert.Error(t, err)
 	assert.Nil(t, result)
+	assert.Equal(t, http.StatusBadGateway, httpCode)
 
 	mockFetcher.AssertExpectations(t)
 }
@@ -79,14 +82,15 @@ func TestAddressErrorUnmarshal(t *testing.T) {
 
 	models := &Models{}
 
-	mockFetcher.On("Fetch", "address", testAddress).Return(expectedBytes, errors.New("fetch error"))
+	mockFetcher.On("Fetch", "address", testAddress).Return(expectedBytes, nil)
 
 	// calls method
-	result, err := models.Address(mockFetcher, testAddress)
+	result, err, httpCode := models.Address(mockFetcher, testAddress)
 
 	// assertions
 	assert.Error(t, err)
 	assert.Nil(t, result)
+	assert.Equal(t, http.StatusInternalServerError, httpCode)
 
 	mockFetcher.AssertExpectations(t)
 }
