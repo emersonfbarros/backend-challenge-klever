@@ -25,7 +25,6 @@ type UtxoNeeded struct {
 func (s *Services) Send(models model.IModels, btcTransactionData *SendBtcConverted) (*UtxoNeeded, error, int) {
 	utxoRef, err, httpCode := models.Utxo(fetcher, btcTransactionData.Address)
 	if err != nil {
-		logger.Errorf("%s", err.Error())
 		return nil, fmt.Errorf("%s", err), httpCode
 	}
 
@@ -52,5 +51,5 @@ func (s *Services) Send(models model.IModels, btcTransactionData *SendBtcConvert
 		}
 	}
 
-	return &utxosNeeded, nil, 0
+	return &utxosNeeded, nil, httpCode
 }
