@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"math/big"
+	"net/http"
 	"testing"
 
 	"github.com/emersonfbarros/backend-challenge-klever/model"
@@ -45,27 +46,20 @@ func TestBalanceCalcSuccess(t *testing.T) {
 
 	// config mocks
 	mockModels.On("Utxo", mock.Anything, "mocked_uxto").
-		Return(&mockedUtxoConverted, nil)
+		Return(&mockedUtxoConverted, nil, 0)
 
 	service := &Services{}
-	result, err := service.BalanceCalc(mockModels, "mocked_uxto")
+	result, err, httpCode := service.BalanceCalc(mockModels, "mocked_uxto")
 
 	// assertions
 	assert.NoError(t, err)
 	assert.Equal(t, expectedBalanceCalcResult, result)
+	assert.Equal(t, 0, httpCode)
 
 	mockModels.AssertExpectations(t)
 }
 
 func TestBalanceCalcError(t *testing.T) {
-	// creates mocks
-	InitService()
-	originalLogger := logger // keeps orginal logger saved
-	mockLogger := new(MockLogger)
-	logger = mockLogger // replaces original with mock
-	defer func() {
-		logger = originalLogger // restores the original logger after test
-	}()
 	mockModels := new(MockIModels)
 
 	// mock expectations
@@ -79,18 +73,16 @@ func TestBalanceCalcError(t *testing.T) {
 
 	// config mocks
 	mockModels.On("Utxo", mock.Anything, "mocked_uxto").
-		Return(&mockedUtxoConverted, errors.New("failed to get utxos"))
-
-	mockLogger.On("Errorf", mock.Anything, mock.Anything).Return()
+		Return(&mockedUtxoConverted, errors.New("failed to get utxos"), http.StatusBadGateway)
 
 	service := &Services{}
-	result, err := service.BalanceCalc(mockModels, "mocked_uxto")
+	result, err, httpCode := service.BalanceCalc(mockModels, "mocked_uxto")
 
 	// asserions
 	assert.Error(t, err)
 	assert.Nil(t, result)
-	assert.Equal(t, "failed to request external resource", err.Error())
+	assert.Equal(t, "failed to get utxos", err.Error())
+	assert.Equal(t, http.StatusBadGateway, httpCode)
 
-	mockLogger.AssertCalled(t, "Errorf", "failed to unmarshal api response %v", mock.Anything)
 	mockModels.AssertExpectations(t)
 }

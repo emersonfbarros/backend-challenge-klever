@@ -17,24 +17,24 @@ type MockServices struct {
 	mock.Mock
 }
 
-func (m *MockServices) BalanceCalc(models model.IModels, address string) (*service.BalanceResult, error) {
+func (m *MockServices) BalanceCalc(models model.IModels, address string) (*service.BalanceResult, error, int) {
 	args := m.Called(models, address)
-	return args.Get(0).(*service.BalanceResult), args.Error(1)
+	return args.Get(0).(*service.BalanceResult), args.Error(1), args.Int(2)
 }
 
-func (m *MockServices) Details(services service.IServices, models model.IModels, address string) (*service.AddressInfo, error) {
+func (m *MockServices) Details(services service.IServices, models model.IModels, address string) (*service.AddressInfo, error, int) {
 	args := m.Called(services, models, address)
-	return args.Get(0).(*service.AddressInfo), args.Error(1)
+	return args.Get(0).(*service.AddressInfo), args.Error(1), args.Int(2)
 }
 
-func (m *MockServices) Tx(models model.IModels, txId string) (*service.Transaction, error) {
+func (m *MockServices) Tx(models model.IModels, txId string) (*service.Transaction, error, int) {
 	args := m.Called(models, txId)
-	return args.Get(0).(*service.Transaction), args.Error(1)
+	return args.Get(0).(*service.Transaction), args.Error(1), args.Int(2)
 }
 
-func (m *MockServices) Send(models model.IModels, btcTransactionData *service.SendBtcConverted) (*service.UtxoNeeded, error) {
+func (m *MockServices) Send(models model.IModels, btcTransactionData *service.SendBtcConverted) (*service.UtxoNeeded, error, int) {
 	args := m.Called(models, btcTransactionData)
-	return args.Get(0).(*service.UtxoNeeded), args.Error(1)
+	return args.Get(0).(*service.UtxoNeeded), args.Error(1), args.Int(2)
 }
 
 func (m *MockServices) Health(fetcher model.IFetcher) *service.HealthRes {
@@ -47,19 +47,19 @@ type MockIModels struct {
 	mock.Mock
 }
 
-func (m *MockIModels) GetTx(fetcher model.IFetcher, txId string) (*model.ExtTx, error) {
+func (m *MockIModels) GetTx(fetcher model.IFetcher, txId string) (*model.ExtTx, error, int) {
 	args := m.Called(fetcher, txId)
-	return args.Get(0).(*model.ExtTx), args.Error(1)
+	return args.Get(0).(*model.ExtTx), args.Error(1), args.Int(2)
 }
 
-func (m *MockIModels) Utxo(fetcher model.IFetcher, address string) (*[]model.UtxoConverted, error) {
+func (m *MockIModels) Utxo(fetcher model.IFetcher, address string) (*[]model.UtxoConverted, error, int) {
 	args := m.Called(fetcher, address)
-	return args.Get(0).(*[]model.UtxoConverted), args.Error(1)
+	return args.Get(0).(*[]model.UtxoConverted), args.Error(1), args.Int(2)
 }
 
-func (m *MockIModels) Address(fetcher model.IFetcher, address string) (*model.AddressRes, error) {
+func (m *MockIModels) Address(fetcher model.IFetcher, address string) (*model.AddressRes, error, int) {
 	args := m.Called(fetcher, address)
-	return args.Get(0).(*model.AddressRes), args.Error(1)
+	return args.Get(0).(*model.AddressRes), args.Error(1), args.Int(2)
 }
 
 // MockResSender mocks IResSender.
@@ -94,7 +94,7 @@ func TestTxSuccess(t *testing.T) {
 		Block: 974235,
 	}
 
-	s.On("Tx", m, mock.Anything).Return(transaction, nil).Once()
+	s.On("Tx", m, mock.Anything).Return(transaction, nil, http.StatusOK).Once()
 
 	r.On("sendSuccess", context, transaction).Once()
 
@@ -123,7 +123,7 @@ func TestTxError(t *testing.T) {
 		Block: 0,
 	}
 
-	s.On("Tx", m, mock.Anything).Return(transaction, errors.New("failed to get transaction")).Once()
+	s.On("Tx", m, mock.Anything).Return(transaction, errors.New("failed to get transaction"), http.StatusBadGateway).Once()
 
 	r.On("sendError", context, http.StatusBadGateway, "failed to get transaction").Once()
 

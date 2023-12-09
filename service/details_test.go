@@ -2,6 +2,8 @@ package service
 
 import (
 	"errors"
+	"fmt"
+	"net/http"
 	"testing"
 
 	"github.com/emersonfbarros/backend-challenge-klever/model"
@@ -14,24 +16,25 @@ type MockServices struct {
 	mock.Mock
 }
 
-func (m *MockServices) BalanceCalc(models model.IModels, address string) (*BalanceResult, error) {
+func (m *MockServices) BalanceCalc(models model.IModels, address string) (*BalanceResult, error, int) {
+	fmt.Printf("\n\nCHAMOU O MOCK\n\n")
 	args := m.Called(models, address)
-	return args.Get(0).(*BalanceResult), args.Error(1)
+	return args.Get(0).(*BalanceResult), args.Error(1), args.Int(2)
 }
 
-func (m *MockServices) Details(services IServices, models model.IModels, address string) (*AddressInfo, error) {
+func (m *MockServices) Details(services IServices, models model.IModels, address string) (*AddressInfo, error, int) {
 	args := m.Called(services, models, address)
-	return args.Get(0).(*AddressInfo), args.Error(1)
+	return args.Get(0).(*AddressInfo), args.Error(1), args.Int(2)
 }
 
-func (m *MockServices) Tx(models model.IModels, txId string) (*Transaction, error) {
+func (m *MockServices) Tx(models model.IModels, txId string) (*Transaction, error, int) {
 	args := m.Called(models, txId)
-	return args.Get(0).(*Transaction), args.Error(1)
+	return args.Get(0).(*Transaction), args.Error(1), args.Int(2)
 }
 
-func (m *MockServices) Send(models model.IModels, btcTransactionData *SendBtcConverted) (*UtxoNeeded, error) {
+func (m *MockServices) Send(models model.IModels, btcTransactionData *SendBtcConverted) (*UtxoNeeded, error, int) {
 	args := m.Called(models, btcTransactionData)
-	return args.Get(0).(*UtxoNeeded), args.Error(1)
+	return args.Get(0).(*UtxoNeeded), args.Error(1), args.Int(2)
 }
 
 func (m *MockServices) Health(fetcher model.IFetcher) *HealthRes {
@@ -61,7 +64,7 @@ func TestDetailsSuccess(t *testing.T) {
 
 	// config mocks
 	mockServices.On("BalanceCalc", mock.Anything, "mocked_address").
-		Return(&expectedAddressInfo.Balance, nil)
+		Return(&expectedAddressInfo.Balance, nil, 0)
 
 	mockModels.On("Address", mock.Anything, "mocked_address").
 		Return(&model.AddressRes{
@@ -69,29 +72,22 @@ func TestDetailsSuccess(t *testing.T) {
 			Txs:           expectedAddressInfo.TotalTx,
 			TotalSent:     expectedAddressInfo.Total.Sent,
 			TotalReceived: expectedAddressInfo.Total.Received,
-		}, nil)
+		}, nil, 0)
 
 	// call target method with mocks
 	service := &Services{}
-	result, err := service.Details(mockServices, mockModels, "mocked_address")
+	result, err, httpCode := service.Details(mockServices, mockModels, "mocked_address")
 
 	// assertions
 	assert.NoError(t, err)
 	assert.Equal(t, expectedAddressInfo, result)
+	assert.Equal(t, 0, httpCode)
 
 	mockServices.AssertExpectations(t)
 	mockModels.AssertExpectations(t)
 }
 
 func TestDetailsBalanceCalcError(t *testing.T) {
-	// creates mocks
-	InitService()
-	originalLogger := logger // keeps orginal logger saved
-	mockLogger := new(MockLogger)
-	logger = mockLogger // replaces original with mock
-	defer func() {
-		logger = originalLogger // restores the original logger after test
-	}()
 	mockServices := new(MockServices)
 	mockModels := new(MockIModels)
 
@@ -109,7 +105,7 @@ func TestDetailsBalanceCalcError(t *testing.T) {
 
 	// config mocks
 	mockServices.On("BalanceCalc", mock.Anything, "mocked_address").
-		Return(&expectedAddressInfo.Balance, errors.New("failed to calc balance"))
+		Return(&expectedAddressInfo.Balance, errors.New("failed to calc balance"), 502)
 
 	mockModels.On("Address", mock.Anything, "mocked_address").
 		Return(&model.AddressRes{
@@ -117,32 +113,22 @@ func TestDetailsBalanceCalcError(t *testing.T) {
 			Txs:           expectedAddressInfo.TotalTx,
 			TotalSent:     expectedAddressInfo.Total.Sent,
 			TotalReceived: expectedAddressInfo.Total.Received,
-		}, nil)
-
-	mockLogger.On("Errorf", mock.Anything, mock.Anything).Return()
+		}, nil, 0)
 
 	// call target method with mocks
 	service := &Services{}
-	result, err := service.Details(mockServices, mockModels, "mocked_address")
+	result, err, httpCode := service.Details(mockServices, mockModels, "mocked_address")
 
-	// asserions
+	// assertions
 	assert.Error(t, err)
 	assert.Nil(t, result)
-	assert.Equal(t, "failed to request external resource", err.Error())
+	assert.Equal(t, "failed to calc balance", err.Error())
+	assert.Equal(t, http.StatusBadGateway, httpCode)
 
-	mockLogger.AssertCalled(t, "Errorf", "failed to request address or utxo", mock.Anything)
 	mockModels.AssertExpectations(t)
 }
 
 func TestDetailsAddressError(t *testing.T) {
-	// creates mocks
-	InitService()
-	originalLogger := logger // keeps orginal logger saved
-	mockLogger := new(MockLogger)
-	logger = mockLogger // replaces original with mock
-	defer func() {
-		logger = originalLogger // restores the original logger after test
-	}()
 	mockServices := new(MockServices)
 	mockModels := new(MockIModels)
 
@@ -160,7 +146,7 @@ func TestDetailsAddressError(t *testing.T) {
 
 	// config mocks
 	mockServices.On("BalanceCalc", mock.Anything, "mocked_address").
-		Return(&expectedAddressInfo.Balance, nil)
+		Return(&expectedAddressInfo.Balance, nil, http.StatusBadGateway)
 
 	mockModels.On("Address", mock.Anything, "mocked_address").
 		Return(&model.AddressRes{
@@ -168,19 +154,17 @@ func TestDetailsAddressError(t *testing.T) {
 			Txs:           expectedAddressInfo.TotalTx,
 			TotalSent:     expectedAddressInfo.Total.Sent,
 			TotalReceived: expectedAddressInfo.Total.Received,
-		}, errors.New("failed to get address"))
-
-	mockLogger.On("Errorf", mock.Anything, mock.Anything).Return()
+		}, errors.New("failed to get address"), http.StatusBadGateway)
 
 	// call target method with mocks
 	service := &Services{}
-	result, err := service.Details(mockServices, mockModels, "mocked_address")
+	result, err, httpCode := service.Details(mockServices, mockModels, "mocked_address")
 
 	// asserions
 	assert.Error(t, err)
 	assert.Nil(t, result)
-	assert.Equal(t, "failed to request external resource", err.Error())
+	assert.Equal(t, "failed to get address", err.Error())
+	assert.Equal(t, http.StatusBadGateway, httpCode)
 
-	mockLogger.AssertCalled(t, "Errorf", "failed to request address or utxo", mock.Anything)
 	mockModels.AssertExpectations(t)
 }

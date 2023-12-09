@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"net/http"
 	"testing"
 
 	"github.com/emersonfbarros/backend-challenge-klever/model"
@@ -14,32 +15,19 @@ type MockIModels struct {
 	mock.Mock
 }
 
-func (m *MockIModels) GetTx(fetcher model.IFetcher, txId string) (*model.ExtTx, error) {
+func (m *MockIModels) GetTx(fetcher model.IFetcher, txId string) (*model.ExtTx, error, int) {
 	args := m.Called(fetcher, txId)
-	return args.Get(0).(*model.ExtTx), args.Error(1)
+	return args.Get(0).(*model.ExtTx), args.Error(1), args.Int(2)
 }
 
-func (m *MockIModels) Utxo(fetcher model.IFetcher, address string) (*[]model.UtxoConverted, error) {
+func (m *MockIModels) Utxo(fetcher model.IFetcher, address string) (*[]model.UtxoConverted, error, int) {
 	args := m.Called(fetcher, address)
-	return args.Get(0).(*[]model.UtxoConverted), args.Error(1)
+	return args.Get(0).(*[]model.UtxoConverted), args.Error(1), args.Int(2)
 }
 
-func (m *MockIModels) Address(fetcher model.IFetcher, address string) (*model.AddressRes, error) {
+func (m *MockIModels) Address(fetcher model.IFetcher, address string) (*model.AddressRes, error, int) {
 	args := m.Called(fetcher, address)
-	return args.Get(0).(*model.AddressRes), args.Error(1)
-}
-
-// mock custom logger
-type MockLogger struct {
-	mock.Mock
-}
-
-func (m *MockLogger) Infof(format string, args ...interface{}) {
-	m.Called(format, args)
-}
-
-func (m *MockLogger) Errorf(format string, args ...interface{}) {
-	m.Called(format, args)
+	return args.Get(0).(*model.AddressRes), args.Error(1), args.Int(2)
 }
 
 func TestTxSuccess(t *testing.T) {
@@ -59,11 +47,11 @@ func TestTxSuccess(t *testing.T) {
 		},
 	}
 
-	modelsMock.On("GetTx", mock.Anything, expectedTxId).Return(expectedExtTx, nil)
+	modelsMock.On("GetTx", mock.Anything, expectedTxId).Return(expectedExtTx, nil, 0)
 
 	services := Services{}
 
-	result, err := services.Tx(modelsMock, expectedTxId)
+	result, err, httpCode := services.Tx(modelsMock, expectedTxId)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, result)
@@ -77,19 +65,12 @@ func TestTxSuccess(t *testing.T) {
 	assert.Equal(t, "3283266", result.Addresses[2].Value)
 	assert.Equal(t, "bc1qanhueax8r4cn52r38f2h727mmgg6hm3xjlwd0x", result.Addresses[3].Address)
 	assert.Equal(t, "90311", result.Addresses[3].Value)
+	assert.Equal(t, 0, httpCode)
 
 	modelsMock.AssertExpectations(t)
 }
 
 func TestTxError(t *testing.T) {
-	InitService()
-	originalLogger := logger // keeps orginal logger saved
-	mockLogger := new(MockLogger)
-	logger = mockLogger // replaces original with mock
-	defer func() {
-		logger = originalLogger // restores the original logger after test
-	}()
-
 	modelsMock := new(MockIModels)
 
 	expectedExtTx := &model.ExtTx{
@@ -100,17 +81,17 @@ func TestTxError(t *testing.T) {
 
 	expectedTxId := "someTxId"
 
-	mockLogger.On("Errorf", mock.Anything, mock.Anything).Return()
-	modelsMock.On("GetTx", mock.Anything, expectedTxId).Return(expectedExtTx, errors.New("failed to request external resource"))
+	modelsMock.On("GetTx", mock.Anything, expectedTxId).
+		Return(expectedExtTx, errors.New("failed to request external resource"), http.StatusBadGateway)
 
 	services := Services{}
 
-	result, err := services.Tx(modelsMock, expectedTxId)
+	result, err, httpCode := services.Tx(modelsMock, expectedTxId)
 
 	assert.Error(t, err)
 	assert.Nil(t, result)
 	assert.Equal(t, "failed to request external resource", err.Error())
+	assert.Equal(t, http.StatusBadGateway, httpCode)
 
-	mockLogger.AssertCalled(t, "Errorf", "failed to unmarshal api response %v", mock.Anything)
 	modelsMock.AssertExpectations(t)
 }
