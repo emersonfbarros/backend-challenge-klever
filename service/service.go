@@ -6,10 +6,10 @@ import (
 )
 
 type IServices interface {
-	BalanceCalc(models model.IModels, address string) (*BalanceResult, error)
+	BalanceCalc(models model.IModels, address string) (*BalanceResult, error, int)
 	Details(services IServices, models model.IModels, address string) (*AddressInfo, error)
 	Tx(models model.IModels, txId string) (*Transaction, error, int)
-	Send(models model.IModels, btcTransactionData *SendBtcConverted) (*UtxoNeeded, error)
+	Send(models model.IModels, btcTransactionData *SendBtcConverted) (*UtxoNeeded, error, int)
 	Health(fetcher model.IFetcher) *HealthRes
 }
 
