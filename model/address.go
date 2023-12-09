@@ -1,6 +1,10 @@
 package model
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"fmt"
+	"net/http"
+)
 
 type AddressRes struct {
 	Balance       string `json:"balance"`
@@ -9,16 +13,20 @@ type AddressRes struct {
 	TotalReceived string `json:"totalReceived"`
 }
 
-func (handler *Models) Address(fetcher IFetcher, address string) (*AddressRes, error) {
+func (handler *Models) Address(fetcher IFetcher, address string) (*AddressRes, error, int) {
 	body, err := fetcher.Fetch("address", address)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Failed to request external resource"), http.StatusBadGateway
 	}
 
 	var addressRes AddressRes
 	if err := json.Unmarshal(body, &addressRes); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Internal server error"), http.StatusInternalServerError
 	}
 
-	return &addressRes, nil
+	if addressRes.Txs == 0 {
+		return nil, fmt.Errorf("Address %s not found", address), http.StatusNotFound
+	}
+
+	return &addressRes, nil, 0
 }
