@@ -30,7 +30,7 @@ func (handler *Models) Utxo(fetcher IFetcher, address string) (*[]UtxoConverted,
 	}
 
 	json.Unmarshal(body, &bodyVerification)
-	if len(bodyVerification.Error) == 0 {
+	if len(bodyVerification.Error) != 0 {
 		return nil, fmt.Errorf("Address %s not found", address), http.StatusNotFound
 	}
 
