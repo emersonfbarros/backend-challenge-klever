@@ -1,8 +1,6 @@
 package service
 
 import (
-	"fmt"
-
 	"github.com/emersonfbarros/backend-challenge-klever/model"
 )
 
@@ -20,7 +18,7 @@ type Address struct {
 func (s *Services) Tx(models model.IModels, txId string) (*Transaction, error, int) {
 	txRef, err, httpCode := models.GetTx(fetcher, txId)
 	if err != nil {
-		return nil, fmt.Errorf("%s", err.Error()), httpCode
+		return nil, err, httpCode
 	}
 
 	extTx := *txRef

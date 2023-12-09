@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"math/big"
 
 	"github.com/emersonfbarros/backend-challenge-klever/model"
@@ -15,7 +14,7 @@ type BalanceResult struct {
 func (s *Services) BalanceCalc(models model.IModels, address string) (*BalanceResult, error, int) {
 	utxoRef, err, httpCode := models.Utxo(fetcher, address)
 	if err != nil {
-		return nil, fmt.Errorf("%s", err.Error()), httpCode
+		return nil, err, httpCode
 	}
 
 	utxoSlice := *utxoRef
