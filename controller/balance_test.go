@@ -28,7 +28,7 @@ func TestBalanceSuccess(t *testing.T) {
 		Unconfirmed: "8527",
 	}
 
-	s.On("BalanceCalc", m, "valid_address").Return(balanceResult, nil).Once()
+	s.On("BalanceCalc", m, "valid_address").Return(balanceResult, nil, http.StatusOK).Once()
 
 	r.On("sendSuccess", context, balanceResult).Once()
 
@@ -56,7 +56,7 @@ func TestBalanceError(t *testing.T) {
 		Unconfirmed: "nil",
 	}
 
-	s.On("BalanceCalc", m, "valid_address").Return(balanceResult, errors.New("failed to get balance")).Once()
+	s.On("BalanceCalc", m, "valid_address").Return(balanceResult, errors.New("failed to get balance"), http.StatusBadGateway).Once()
 
 	r.On("sendError", context, http.StatusBadGateway, "failed to get balance").Once()
 

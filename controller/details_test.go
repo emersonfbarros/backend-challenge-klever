@@ -37,7 +37,7 @@ func TestDetailsSuccess(t *testing.T) {
 		},
 	}
 
-	s.On("Details", s, m, "valid_address").Return(detailsResult, nil).Once()
+	s.On("Details", s, m, "valid_address").Return(detailsResult, nil, 0).Once()
 
 	r.On("sendSuccess", context, detailsResult).Once()
 
@@ -74,7 +74,7 @@ func TestDetailsError(t *testing.T) {
 		},
 	}
 
-	s.On("Details", s, m, "valid_address").Return(detailsResult, errors.New("failed to get details")).Once()
+	s.On("Details", s, m, "valid_address").Return(detailsResult, errors.New("failed to get details"), http.StatusBadGateway).Once()
 
 	r.On("sendError", context, http.StatusBadGateway, "failed to get details").Once()
 
