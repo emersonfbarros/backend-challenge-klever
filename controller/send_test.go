@@ -61,6 +61,7 @@ func TestSendSuccess(t *testing.T) {
 
 	// config mocks
 	mockServices.On("Send", models, &expectedDataToCallSend).Return(expectedUtxo, nil, 0)
+
 	mockResSend.On("sendSuccess", context, expectedUtxo)
 
 	Send(context)

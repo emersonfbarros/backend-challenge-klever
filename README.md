@@ -2,9 +2,7 @@
 
 **Warning:** This project is a work in progress. There are tasks to complete so that all challenge requirements are met. But the application itself is already complete and working. 
 
-- Some unit and integration tests still need to be created. 
-- A Makefile will be added for build and deployment automation.
-- Instructions for starting the application via a Docker container will be provided.
+- Some integration tests still need to be created. 
 
 ## Table of Contents
 
@@ -18,36 +16,72 @@
 Restful API created with [Go](https://go.dev/) and the [Gin](https://gin-gonic.com/) framework that implements some functions of a bitcoin wallet. 
 ## Getting Started
 
-**Prerequisites:**
+### Prerequisites:
 
 - Make sure you have [Go](https://go.dev/), version 1.21.4 or higher, installed on your device;
 - Create a valid .env file following the .env.example template that is in the root of the project;
 - Ensure that no application is listening on port :8080.
 
-**Preparing the environment:**
+### Preparing the environment
 
 Before running locally, run the command below to ensure that all dependencies will be installed:
 
 ```shell
-go mod tidy
+go mod download
 ```
+
+### Running locally
 
 **Running the API without build:**
 
-At the root of the project, run the command 
+At the root of the project, run the command:
 
 ```shell
 go run ./main.go
 ```
 
-**Running the API with build (on Linux or Mac):**
+### Using Makefile commands
 
-At the root of the project, run the command 
+The project includes a Makefile to help you manage common tasks more easily. Here's a list of the available commands and a brief description of what they do:
+
+- `make run`: Run the application in gin debug mode.
+- `make build`: Build the application and create an executable file named `gowallet`.
+- `make release`: Run the application in gin release mode.
+- `make test`: Run tests for all packages in the project.
+- `make test-verbose`: Run tests for all packages in the project in verbose mode.
+- `make test-coverage`: Runs tests for all packages and shows coverage.
+- `make clean`: Remove the `gowallet` executable.
+
+To use these commands, simply type `make` followed by the desired command in your terminal. For example:
 
 ```shell
-go build -o api ./main.go && ./api
+make run
 ```
 
+### Docker and Docker compose
+
+This project includes a `Dockerfile` and `docker-compose.yml` file for easy containerization and deployment.
+
+**Running application with Docker:**
+
+At the root of the project:
+
+- `docker build -t your-image-name .`: Build a Docker image for the project. Replace `your-image-name` with a name for your image.
+- `docker run -d -p 8080:8080 --name your-container-name your-image-name:latest`: Run a container based on the built image in detached mode. Replace `your-container-name` with a name for container and replace `your-image-name` with the name you used when building the image.
+- `docker stop your-container-name`: Stop the container running the application.
+- `docker start your-container-name`: Restarts the previously initialized container.
+
+**Using Docker compose:**
+
+If you want to use Docker Compose, follow these commands in the root of the project:
+
+- `docker compose up -d`: Build and run the services defined in the `docker-compose.yml` file in detached mode.
+
+To stop and remove containers, networks, and volumes defined in the `docker-compose.yml` file, run:
+
+```shell
+docker-compose down
+```
 
 ## API Endpoints
 
@@ -55,7 +89,11 @@ The base url will be: `http://localhost:8080/api/v1`
 
 **Health** [GET]: `/health`
 
+Try with curl: `curl -svX GET 'http://localhost:8080/api/v1/health'`
+
 _Response:_
+
+External API response time is calculated by making three simultaneous calls to the external api using goroutines.
 
 ```json
 {
@@ -69,13 +107,11 @@ _Response:_
 }
 ```
 
-Try with curl: `curl -svX GET 'http://localhost:8080/api/v1/health'`
-
-External API response time is calculated by making three simultaneous calls to the external api using goroutines.
-
 **Details** [GET]: `/details/19SH3YrkrpWXKtCoMXWfoVpmUF1ZHAi24n`
 
 _Response:_
+
+Try with curl: `curl -svX GET 'http://localhost:8080/api/v1/details/19SH3YrkrpWXKtCoMXWfoVpmUF1ZHAi24n'`
 
 ```json
 {
@@ -93,9 +129,9 @@ _Response:_
 }
 ```
 
-Try with curl: `curl -svX GET 'http://localhost:8080/api/v1/details/19SH3YrkrpWXKtCoMXWfoVpmUF1ZHAi24n'`
-
 **Balance** [GET]: `/balance/19SH3YrkrpWXKtCoMXWfoVpmUF1ZHAi24n`
+
+Try with curl: `curl -svX GET 'http://localhost:8080/api/v1/balance/19SH3YrkrpWXKtCoMXWfoVpmUF1ZHAi24n'`
 
 _Response:_
 
@@ -106,9 +142,9 @@ _Response:_
 }
 ```
 
-Try with curl: `curl -svX GET 'http://localhost:8080/api/v1/balance/19SH3YrkrpWXKtCoMXWfoVpmUF1ZHAi24n'`
-
 **Send** [POST]: `/send`
+
+Try with curl: `curl -svX POST "http://localhost:8080/api/v1/send" -H 'Content-Type: application/json' -d '{"address": "19SH3YrkrpWXKtCoMXWfoVpmUF1ZHAi24n", "amount": "1208053"}'`
 
 _Response:_
 
@@ -127,11 +163,11 @@ _Response:_
 }
 ```
 
-Try with curl: `curl -svX POST "http://localhost:8080/api/v1/send" -H 'Content-Type: application/json' -d '{"address": "19SH3YrkrpWXKtCoMXWfoVpmUF1ZHAi24n", "amount": "1208053"}'`
-
 **Transaction** [GET]: `/tx/3654d26660dcc05d4cfb25a1641a1e61f06dfeb38ee2279bdb049d018f1830ab`
 
 _Response:_
+
+Try with curl `curl -svX GET 'http://localhost:8080/api/v1/tx/3654d26660dcc05d4cfb25a1641a1e61f06dfeb38ee2279bdb049d018f1830ab'`
 
 ```json
 {
@@ -161,7 +197,7 @@ Try with curl `curl -svX GET 'http://localhost:8080/api/v1/tx/3654d26660dcc05d4c
 
 The tests were created with built-in Go packages and the [testify](https://github.com/stretchr/testify) toolkit.
 
-To run the tests implemented so far, at the root of the project run:
+To run the tests implemented so far you can use the makefile commands mentioned above or, at the root of the project, run:
 
 ```shell
 go test ./...
@@ -171,4 +207,10 @@ For a more verbose result:
 
 ```shell
 go test -v ./...
+```
+
+To see test coverage:
+
+```shell
+go test -v ./... -coverprofile=cover.out
 ```

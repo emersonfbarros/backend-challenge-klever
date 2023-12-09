@@ -58,6 +58,7 @@ func TestBalanceError(t *testing.T) {
 
 	s.On("BalanceCalc", m, "valid_address").Return(balanceResult, errors.New("failed to get balance"), http.StatusBadGateway).Once()
 
+
 	r.On("sendError", context, http.StatusBadGateway, "failed to get balance").Once()
 
 	Balance(context)

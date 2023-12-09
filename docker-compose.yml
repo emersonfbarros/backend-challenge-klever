@@ -1,0 +1,9 @@
+version: '3.8'
+services:
+  gowallet:
+    build: .
+    image: gowallet
+    container_name: gowallet
+    ports:
+      - "8080:8080"
+    restart: "on-failure:5"
