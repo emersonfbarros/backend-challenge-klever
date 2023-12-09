@@ -24,9 +24,12 @@ func (handler *Models) Utxo(fetcher IFetcher, address string) (*[]UtxoConverted,
 		return nil, err, http.StatusBadGateway
 	}
 
-	var utxoVerification UtxoRes
-	json.Unmarshal(body, &utxoVerification)
-	if utxoVerification.Confirmations == 0 {
+	var bodyVerification struct {
+		Error string `json:"error"`
+	}
+
+	json.Unmarshal(body, &bodyVerification)
+	if len(bodyVerification.Error) == 0 {
 		return nil, err, http.StatusNotFound
 	}
 
