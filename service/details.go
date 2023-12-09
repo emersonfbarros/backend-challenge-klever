@@ -20,31 +20,31 @@ type AddressInfo struct {
 	Total           Total         `json:"total"`
 }
 
-func (s *Services) Details(services IServices, models model.IModels, address string) (*AddressInfo, error) {
+func (s *Services) Details(services IServices, models model.IModels, address string) (*AddressInfo, error, int) {
 	var wg sync.WaitGroup
 	wg.Add(2)
 
 	var detailsRef *model.AddressRes
 	var balanceRef *BalanceResult
 	var errDt, errBl error
+	var httpCode int
 
 	// fetch external api simultaneously
 	go func() {
 		defer wg.Done()
-		balanceRef, errBl = services.BalanceCalc(models, address)
+		balanceRef, errBl, httpCode = services.BalanceCalc(models, address)
 	}()
 
 	go func() {
 		defer wg.Done()
-		detailsRef, errDt = models.Address(fetcher, address)
+		detailsRef, errDt, httpCode = models.Address(fetcher, address)
 	}()
 
 	// wait for both requests to complete
 	wg.Wait()
 
 	if errBl != nil || errDt != nil {
-		logger.Errorf("failed to request address or utxo")
-		return nil, fmt.Errorf("failed to request external resource")
+		return nil, fmt.Errorf("%s", errDt.Error()), httpCode
 	}
 
 	detailsPartial := *detailsRef
@@ -61,5 +61,5 @@ func (s *Services) Details(services IServices, models model.IModels, address str
 		},
 	}
 
-	return &adressInfo, nil
+	return &adressInfo, nil, httpCode
 }
