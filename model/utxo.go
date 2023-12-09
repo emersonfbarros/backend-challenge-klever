@@ -2,6 +2,7 @@ package model
 
 import (
 	"encoding/json"
+	"fmt"
 	"math/big"
 	"net/http"
 )
@@ -30,7 +31,7 @@ func (handler *Models) Utxo(fetcher IFetcher, address string) (*[]UtxoConverted,
 
 	json.Unmarshal(body, &bodyVerification)
 	if len(bodyVerification.Error) == 0 {
-		return nil, err, http.StatusNotFound
+		return nil, fmt.Errorf("Address %s not found", address), http.StatusNotFound
 	}
 
 	var utxoRes []UtxoRes
