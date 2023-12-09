@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"sync"
 
 	"github.com/emersonfbarros/backend-challenge-klever/model"
@@ -43,8 +42,12 @@ func (s *Services) Details(services IServices, models model.IModels, address str
 	// wait for both requests to complete
 	wg.Wait()
 
-	if errBl != nil || errDt != nil {
-		return nil, fmt.Errorf("%s", errDt.Error()), httpCode
+	if errBl != nil {
+		return nil, errBl, httpCode
+	}
+
+	if errDt != nil {
+		return nil, errDt, httpCode
 	}
 
 	detailsPartial := *detailsRef
