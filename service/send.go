@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"math/big"
 	"sort"
 
@@ -25,7 +24,7 @@ type UtxoNeeded struct {
 func (s *Services) Send(models model.IModels, btcTransactionData *SendBtcConverted) (*UtxoNeeded, error, int) {
 	utxoRef, err, httpCode := models.Utxo(fetcher, btcTransactionData.Address)
 	if err != nil {
-		return nil, fmt.Errorf("%s", err), httpCode
+		return nil, err, httpCode
 	}
 
 	// sort utxo slice in descending order
