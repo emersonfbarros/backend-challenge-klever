@@ -1,16 +1,12 @@
 package controller
 
-import (
-	"net/http"
-
-	"github.com/gin-gonic/gin"
-)
+import "github.com/gin-gonic/gin"
 
 func Details(context *gin.Context) {
 	address := context.Param("address")
-	details, err := services.Details(services, models, address)
-	if err != nil {
-		resSender.sendError(context, http.StatusBadGateway, err.Error())
+	details, err, httpCode := services.Details(services, models, address)
+	if httpCode != 0 {
+		resSender.sendError(context, httpCode, err.Error())
 		return
 	}
 

@@ -11,9 +11,9 @@ type IFetcher interface {
 }
 
 type IModels interface {
-	Utxo(fetcher IFetcher, address string) (*[]UtxoConverted, error)
-	Address(fetcher IFetcher, address string) (*AddressRes, error)
-	GetTx(fetcher IFetcher, txId string) (*ExtTx, error)
+	Utxo(fetcher IFetcher, address string) (*[]UtxoConverted, error, int)
+	Address(fetcher IFetcher, address string) (*AddressRes, error, int)
+	GetTx(fetcher IFetcher, txId string) (*ExtTx, error, int)
 }
 
 type Fetcher struct {

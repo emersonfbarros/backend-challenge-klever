@@ -2,7 +2,9 @@ package model
 
 import (
 	"encoding/json"
+	"fmt"
 	"math/big"
+	"net/http"
 )
 
 type UtxoRes struct {
@@ -17,15 +19,24 @@ type UtxoConverted struct {
 	Confirmations int
 }
 
-func (handler *Models) Utxo(fetcher IFetcher, address string) (*[]UtxoConverted, error) {
+func (handler *Models) Utxo(fetcher IFetcher, address string) (*[]UtxoConverted, error, int) {
 	body, err := fetcher.Fetch("utxo", address)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Failed to request external resource"), http.StatusBadGateway
+	}
+
+	var bodyVerification struct {
+		Error string `json:"error"`
+	}
+
+	json.Unmarshal(body, &bodyVerification)
+	if len(bodyVerification.Error) != 0 {
+		return nil, fmt.Errorf("Address %s not found", address), http.StatusNotFound
 	}
 
 	var utxoRes []UtxoRes
 	if err := json.Unmarshal(body, &utxoRes); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Internal server error"), http.StatusInternalServerError
 	}
 
 	var utxoConverted []UtxoConverted
@@ -40,5 +51,5 @@ func (handler *Models) Utxo(fetcher IFetcher, address string) (*[]UtxoConverted,
 		})
 	}
 
-	return &utxoConverted, nil
+	return &utxoConverted, nil, 0
 }

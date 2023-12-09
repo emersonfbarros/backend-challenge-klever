@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"math/big"
 
 	"github.com/emersonfbarros/backend-challenge-klever/model"
@@ -12,11 +11,10 @@ type BalanceResult struct {
 	Unconfirmed string `json:"unconfirmed"`
 }
 
-func (s *Services) BalanceCalc(models model.IModels, address string) (*BalanceResult, error) {
-	utxoRef, err := models.Utxo(fetcher, address)
+func (s *Services) BalanceCalc(models model.IModels, address string) (*BalanceResult, error, int) {
+	utxoRef, err, httpCode := models.Utxo(fetcher, address)
 	if err != nil {
-		logger.Errorf("failed to unmarshal api response %v", err.Error())
-		return nil, fmt.Errorf("failed to request external resource")
+		return nil, err, httpCode
 	}
 
 	utxoSlice := *utxoRef
@@ -35,5 +33,5 @@ func (s *Services) BalanceCalc(models model.IModels, address string) (*BalanceRe
 		Unconfirmed: unconfirmed.String(),
 	}
 
-	return &balanceResult, nil
+	return &balanceResult, nil, httpCode
 }

@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"math/big"
 	"sort"
 
@@ -22,11 +21,10 @@ type UtxoNeeded struct {
 	Utxos []Utxo `json:"utxos"`
 }
 
-func (s *Services) Send(models model.IModels, btcTransactionData *SendBtcConverted) (*UtxoNeeded, error) {
-	utxoRef, err := models.Utxo(fetcher, btcTransactionData.Address)
+func (s *Services) Send(models model.IModels, btcTransactionData *SendBtcConverted) (*UtxoNeeded, error, int) {
+	utxoRef, err, httpCode := models.Utxo(fetcher, btcTransactionData.Address)
 	if err != nil {
-		logger.Errorf("failed to unmarshal api response %v", err.Error())
-		return nil, fmt.Errorf("failed to request external resouce")
+		return nil, err, httpCode
 	}
 
 	// sort utxo slice in descending order
@@ -52,5 +50,5 @@ func (s *Services) Send(models model.IModels, btcTransactionData *SendBtcConvert
 		}
 	}
 
-	return &utxosNeeded, nil
+	return &utxosNeeded, nil, httpCode
 }
