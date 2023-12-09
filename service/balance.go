@@ -15,7 +15,6 @@ type BalanceResult struct {
 func (s *Services) BalanceCalc(models model.IModels, address string) (*BalanceResult, error, int) {
 	utxoRef, err, httpCode := models.Utxo(fetcher, address)
 	if err != nil {
-		logger.Errorf("%s", err.Error())
 		return nil, fmt.Errorf("%s", err.Error()), httpCode
 	}
 
@@ -35,5 +34,5 @@ func (s *Services) BalanceCalc(models model.IModels, address string) (*BalanceRe
 		Unconfirmed: unconfirmed.String(),
 	}
 
-	return &balanceResult, nil, 0
+	return &balanceResult, nil, httpCode
 }

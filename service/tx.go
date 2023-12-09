@@ -44,5 +44,5 @@ func (s *Services) Tx(models model.IModels, txId string) (*Transaction, error, i
 		})
 	}
 
-	return &transaction, nil, 0
+	return &transaction, nil, httpCode
 }
