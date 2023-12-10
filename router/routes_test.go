@@ -1,6 +1,7 @@
 package router
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"net/http"
@@ -11,6 +12,18 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 )
+
+func setupReq(method string, route string, value string, body string) *http.Request {
+	apiBaseURL := "/api/v1/"
+
+	if route == "send/" {
+		req, _ := http.NewRequest(method, apiBaseURL+route, bytes.NewBuffer([]byte(body)))
+		return req
+	}
+
+	req, _ := http.NewRequest(method, apiBaseURL+route+value, nil)
+	return req
+}
 
 func TestRoutesIntegration(t *testing.T) {
 	utxoResSuccess := `[
@@ -83,6 +96,8 @@ func TestRoutesIntegration(t *testing.T) {
 		utxoRouteRes    string
 		txRouteRes      string
 		addressRouteRes string
+		postBody        string
+		httpMethod      string
 	}{
 		{
 			name:         "Test balance route on success",
@@ -91,6 +106,7 @@ func TestRoutesIntegration(t *testing.T) {
 			utxoRouteRes: utxoResSuccess,
 			expectedBody: `{"confirmed":"705425","unconfirmed":"0"}`,
 			expectedCode: http.StatusOK,
+			httpMethod:   http.MethodGet,
 		},
 		{
 			name:         "Test balance route on not found",
@@ -99,6 +115,7 @@ func TestRoutesIntegration(t *testing.T) {
 			utxoRouteRes: serverErrorMsg,
 			expectedBody: notFoundAddress,
 			expectedCode: http.StatusNotFound,
+			httpMethod:   http.MethodGet,
 		},
 		{
 			name:         "Test balance route on internal server error",
@@ -107,6 +124,7 @@ func TestRoutesIntegration(t *testing.T) {
 			utxoRouteRes: "invalid",
 			expectedBody: internalErrorMsg,
 			expectedCode: http.StatusInternalServerError,
+			httpMethod:   http.MethodGet,
 		},
 		{
 			name:         "Test balance route on external api failure",
@@ -115,6 +133,7 @@ func TestRoutesIntegration(t *testing.T) {
 			utxoRouteRes: "error",
 			expectedBody: badGatewayMsg,
 			expectedCode: http.StatusBadGateway,
+			httpMethod:   http.MethodGet,
 		},
 		{
 			name:            "Test details route on success",
@@ -124,6 +143,7 @@ func TestRoutesIntegration(t *testing.T) {
 			addressRouteRes: addressResSuccess,
 			expectedBody:    `{"address":"19SH3YrkrpWXKtCoMXWfoVpmUF1ZHAi24n","balance":"17454817","totalTx":647,"balanceCalc":{"confirmed":"705425","unconfirmed":"0"},"total":{"sent":"176043318","received":"193498135"}}`,
 			expectedCode:    http.StatusOK,
+			httpMethod:      http.MethodGet,
 		},
 		{
 			name:            "Test details route on not found",
@@ -133,6 +153,7 @@ func TestRoutesIntegration(t *testing.T) {
 			addressRouteRes: serverErrorMsg,
 			expectedBody:    notFoundAddress,
 			expectedCode:    http.StatusNotFound,
+			httpMethod:      http.MethodGet,
 		},
 		{
 			name:            "Test details route on internal server error",
@@ -142,6 +163,7 @@ func TestRoutesIntegration(t *testing.T) {
 			addressRouteRes: "invalid",
 			expectedBody:    internalErrorMsg,
 			expectedCode:    http.StatusInternalServerError,
+			httpMethod:      http.MethodGet,
 		},
 		{
 			name:            "Test details route on external api failure",
@@ -151,6 +173,7 @@ func TestRoutesIntegration(t *testing.T) {
 			addressRouteRes: "error",
 			expectedBody:    badGatewayMsg,
 			expectedCode:    http.StatusBadGateway,
+			httpMethod:      http.MethodGet,
 		},
 		{
 			name:         "Test tx route on success",
@@ -159,6 +182,7 @@ func TestRoutesIntegration(t *testing.T) {
 			txRouteRes:   txResSuccess,
 			expectedBody: `{"addresses":[{"address":"bc1qyzxdu4px4jy8gwhcj82zpv7qzhvc0fvumgnh0r","value":"484817655"},{"address":"36iYTpBFVZPbcyUs8pj3BtutZXzN6HPNA6","value":"623579"},{"address":"bc1qe29ydjtwyjdmffxg4qwtd5wfwzdxvnap989glq","value":"3283266"},{"address":"bc1qanhueax8r4cn52r38f2h727mmgg6hm3xjlwd0x","value":"90311"}],"block":675674,"txID":"3654d26660dcc05d4cfb25a1641a1e61f06dfeb38ee2279bdb049d018f1830ab"}`,
 			expectedCode: http.StatusOK,
+			httpMethod:   http.MethodGet,
 		},
 		{
 			name:         "Test tx route on not found",
@@ -167,6 +191,7 @@ func TestRoutesIntegration(t *testing.T) {
 			txRouteRes:   serverErrorMsg,
 			expectedBody: notFoundTx,
 			expectedCode: http.StatusNotFound,
+			httpMethod:   http.MethodGet,
 		},
 		{
 			name:         "Test tx route on internal server error",
@@ -175,6 +200,7 @@ func TestRoutesIntegration(t *testing.T) {
 			txRouteRes:   "invalid",
 			expectedBody: internalErrorMsg,
 			expectedCode: http.StatusInternalServerError,
+			httpMethod:   http.MethodGet,
 		},
 		{
 			name:         "Test tx route on external api failure",
@@ -183,6 +209,7 @@ func TestRoutesIntegration(t *testing.T) {
 			txRouteRes:   "error",
 			expectedBody: badGatewayMsg,
 			expectedCode: http.StatusBadGateway,
+			httpMethod:   http.MethodGet,
 		},
 	}
 
@@ -223,8 +250,9 @@ func TestRoutesIntegration(t *testing.T) {
 			} else {
 				routeValue = tt.address
 			}
-			// creates request for balance route
-			req, _ := http.NewRequest(http.MethodGet, "/api/v1/"+tt.route+routeValue, nil)
+
+			// creates reques for apllication server
+			req := setupReq(tt.httpMethod, tt.route, routeValue, tt.postBody)
 			resp := httptest.NewRecorder()
 
 			// handles request
