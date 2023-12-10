@@ -241,6 +241,15 @@ func TestRoutesIntegration(t *testing.T) {
 			httpMethod:   http.MethodPost,
 			postBody:     fmt.Sprintf(`{"address":"%s","amount":"310738"}`, address),
 		},
+		{
+			name:         "Test send route on external api failure",
+			route:        "send",
+			utxoRouteRes: "error",
+			expectedBody: badGatewayMsg,
+			expectedCode: http.StatusBadGateway,
+			httpMethod:   http.MethodPost,
+			postBody:     fmt.Sprintf(`{"address":"%s","amount":"310738"}`, address),
+		},
 	}
 
 	for _, tt := range tests {
