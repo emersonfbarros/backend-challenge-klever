@@ -202,7 +202,7 @@ func TestRoutesIntegration(t *testing.T) {
 				}
 			}))
 
-			if tt.utxoRouteRes == "error" || tt.address == "error" || tt.txRouteRes == "error" {
+			if tt.utxoRouteRes == "error" || tt.addressRouteRes == "error" || tt.txRouteRes == "error" {
 				// closes server early to force request error
 				testServer.Close()
 			} else {
