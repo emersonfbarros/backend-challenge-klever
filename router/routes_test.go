@@ -68,7 +68,8 @@ func TestRoutesIntegration(t *testing.T) {
 	// invalidTx := "1nv4lid_7x"
 
 	serverErrorMsg := `{"error":"Whatever not found"}`
-	// badGatewayMds := `{"message":"Failed to request external resource"}`
+	badGatewayMsg := `{"message":"Failed to request external resource"}`
+	internalErrorMsg := `{"message":"Internal server error"}`
 	notFoundAddress := fmt.Sprintf(`{"message":"Address %s not found"}`, invalidAddress)
 	// notFoundTx := fmt.Sprintf("Transaction %s not found", invalidTx)
 
@@ -98,6 +99,22 @@ func TestRoutesIntegration(t *testing.T) {
 			utxoRouteRes: serverErrorMsg,
 			expectedBody: notFoundAddress,
 			expectedCode: http.StatusNotFound,
+		},
+		{
+			name:         "Test balance route on internal server error",
+			address:      address,
+			route:        "balance/",
+			utxoRouteRes: "invalid",
+			expectedBody: internalErrorMsg,
+			expectedCode: http.StatusInternalServerError,
+		},
+		{
+			name:         "Test balance route on external api failure",
+			address:      address,
+			route:        "balance/",
+			utxoRouteRes: "error",
+			expectedBody: badGatewayMsg,
+			expectedCode: http.StatusBadGateway,
 		},
 		{
 			name:            "Test details route on success",
@@ -142,8 +159,14 @@ func TestRoutesIntegration(t *testing.T) {
 					w.Write([]byte(serverErrorMsg))
 				}
 			}))
-			// close test server when test finishes
-			defer testServer.Close()
+
+			if tt.utxoRouteRes == "error" || tt.address == "error" || tt.txRouteRes == "error" {
+				// closes server early to force request error
+				testServer.Close()
+			} else {
+				// close test server when test finishes
+				defer testServer.Close()
+			}
 
 			os.Setenv("BASE_URL", testServer.URL)
 
