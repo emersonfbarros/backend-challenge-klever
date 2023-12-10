@@ -224,11 +224,22 @@ func TestRoutesIntegration(t *testing.T) {
 		{
 			name:         "Test send route on not found",
 			route:        "send",
+			address:      invalidAddress,
 			utxoRouteRes: serverErrorMsg,
 			expectedBody: notFoundAddress,
 			expectedCode: http.StatusNotFound,
 			httpMethod:   http.MethodPost,
 			postBody:     fmt.Sprintf(`{"address":"%s","amount":"310738"}`, invalidAddress),
+		},
+		{
+			name:         "Test send route on internal server error",
+			route:        "send",
+			utxoRouteRes: "invalid",
+			address:      address,
+			expectedBody: internalErrorMsg,
+			expectedCode: http.StatusInternalServerError,
+			httpMethod:   http.MethodPost,
+			postBody:     fmt.Sprintf(`{"address":"%s","amount":"310738"}`, address),
 		},
 	}
 
