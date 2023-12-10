@@ -221,6 +221,15 @@ func TestRoutesIntegration(t *testing.T) {
 			httpMethod:   http.MethodPost,
 			postBody:     fmt.Sprintf(`{"address":"%s","amount":"310738"}`, address),
 		},
+		{
+			name:         "Test send route on not found",
+			route:        "send",
+			utxoRouteRes: serverErrorMsg,
+			expectedBody: notFoundAddress,
+			expectedCode: http.StatusNotFound,
+			httpMethod:   http.MethodPost,
+			postBody:     fmt.Sprintf(`{"address":"%s","amount":"310738"}`, invalidAddress),
+		},
 	}
 
 	for _, tt := range tests {
