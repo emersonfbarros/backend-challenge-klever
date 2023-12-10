@@ -16,8 +16,8 @@ import (
 func setupReq(method string, route string, value string, body string) *http.Request {
 	apiBaseURL := "/api/v1/"
 
-	if route == "send/" {
-		req, _ := http.NewRequest(method, apiBaseURL+route, bytes.NewBuffer([]byte(body)))
+	if route == "send" {
+		req, _ := http.NewRequest(method, apiBaseURL+route, bytes.NewReader([]byte(body)))
 		return req
 	}
 
@@ -210,6 +210,16 @@ func TestRoutesIntegration(t *testing.T) {
 			expectedBody: badGatewayMsg,
 			expectedCode: http.StatusBadGateway,
 			httpMethod:   http.MethodGet,
+		},
+		{
+			name:         "Test send route on success",
+			route:        "send",
+			utxoRouteRes: utxoResSuccess,
+			address:      address,
+			expectedBody: `{"utxos":[{"txid":"1c16ffaad93464a35af0501b95274fe08e2f68beeadc1599cda14f2fb612f1b6","amount":"450460"}]}`,
+			expectedCode: http.StatusOK,
+			httpMethod:   http.MethodPost,
+			postBody:     fmt.Sprintf(`{"address":"%s","amount":"310738"}`, address),
 		},
 	}
 
