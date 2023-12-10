@@ -65,13 +65,13 @@ func TestRoutesIntegration(t *testing.T) {
 	address := "19SH3YrkrpWXKtCoMXWfoVpmUF1ZHAi24n"
 	tx := "3654d26660dcc05d4cfb25a1641a1e61f06dfeb38ee2279bdb049d018f1830ab"
 	invalidAddress := "1nv4lid_4ddre55"
-	// invalidTx := "1nv4lid_7x"
+	invalidTx := "1nv4lid_7x"
 
 	serverErrorMsg := `{"error":"Whatever not found"}`
 	badGatewayMsg := `{"message":"Failed to request external resource"}`
 	internalErrorMsg := `{"message":"Internal server error"}`
 	notFoundAddress := fmt.Sprintf(`{"message":"Address %s not found"}`, invalidAddress)
-	// notFoundTx := fmt.Sprintf("Transaction %s not found", invalidTx)
+	notFoundTx := fmt.Sprintf(`{"message":"Transaction %s not found"}`, invalidTx)
 
 	tests := []struct {
 		name            string
@@ -159,6 +159,30 @@ func TestRoutesIntegration(t *testing.T) {
 			txRouteRes:   txResSuccess,
 			expectedBody: `{"addresses":[{"address":"bc1qyzxdu4px4jy8gwhcj82zpv7qzhvc0fvumgnh0r","value":"484817655"},{"address":"36iYTpBFVZPbcyUs8pj3BtutZXzN6HPNA6","value":"623579"},{"address":"bc1qe29ydjtwyjdmffxg4qwtd5wfwzdxvnap989glq","value":"3283266"},{"address":"bc1qanhueax8r4cn52r38f2h727mmgg6hm3xjlwd0x","value":"90311"}],"block":675674,"txID":"3654d26660dcc05d4cfb25a1641a1e61f06dfeb38ee2279bdb049d018f1830ab"}`,
 			expectedCode: http.StatusOK,
+		},
+		{
+			name:         "Test tx route on not found",
+			tx:           invalidTx,
+			route:        "tx/",
+			txRouteRes:   serverErrorMsg,
+			expectedBody: notFoundTx,
+			expectedCode: http.StatusNotFound,
+		},
+		{
+			name:         "Test tx route on internal server error",
+			tx:           tx,
+			route:        "tx/",
+			txRouteRes:   "invalid",
+			expectedBody: internalErrorMsg,
+			expectedCode: http.StatusInternalServerError,
+		},
+		{
+			name:         "Test tx route on external api failure",
+			tx:           tx,
+			route:        "tx/",
+			txRouteRes:   "error",
+			expectedBody: badGatewayMsg,
+			expectedCode: http.StatusBadGateway,
 		},
 	}
 
