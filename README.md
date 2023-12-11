@@ -1,9 +1,5 @@
 # Backend challenge for Klever
 
-**Warning:** This project is a work in progress. There are tasks to complete so that all challenge requirements are met. But the application itself is already complete and working. 
-
-- Some integration tests still need to be created. 
-
 ## Table of Contents
 
 - [Introduction](#introduction)
@@ -110,9 +106,9 @@ HTTP code: `200 OK`
 
 **Details** [GET]: `/details/19SH3YrkrpWXKtCoMXWfoVpmUF1ZHAi24n`
 
-_Possible responses:_
-
 Try with curl: `curl -svX GET 'http://localhost:8080/api/v1/details/19SH3YrkrpWXKtCoMXWfoVpmUF1ZHAi24n'`
+
+_Possible responses:_
 
 HTTP code: `200 OK`
 ```json
@@ -156,7 +152,7 @@ HTTP code: `500 Bad Gateway`
 
 Try with curl: `curl -svX GET 'http://localhost:8080/api/v1/balance/19SH3YrkrpWXKtCoMXWfoVpmUF1ZHAi24n'`
 
-_Response:_
+_Possible responses:_
 
 HTTP code: `200 OK`
 ```json
@@ -200,7 +196,7 @@ Request body:
 
 Try with curl: `curl -svX POST "http://localhost:8080/api/v1/send" -H 'Content-Type: application/json' -d '{"address": "19SH3YrkrpWXKtCoMXWfoVpmUF1ZHAi24n", "amount": "1208053"}'`
 
-_Response:_
+_Possible responses:_
 
 HTTP code: `200 OK`
 ```json
@@ -248,9 +244,9 @@ HTTP code: `500 Bad Gateway`
 
 **Transaction** [GET]: `/tx/3654d26660dcc05d4cfb25a1641a1e61f06dfeb38ee2279bdb049d018f1830ab`
 
-_Response:_
-
 Try with curl `curl -svX GET 'http://localhost:8080/api/v1/tx/3654d26660dcc05d4cfb25a1641a1e61f06dfeb38ee2279bdb049d018f1830ab'`
+
+_Possible responses:_
 
 HTTP code: `200 OK`
 ```json
@@ -301,7 +297,7 @@ HTTP code: `500 Bad Gateway`
 
 The tests were created with built-in Go packages and the [testify](https://github.com/stretchr/testify) toolkit.
 
-To run the tests implemented so far you can use the makefile commands mentioned above or, at the root of the project, run:
+To run the tests you can use the makefile commands mentioned above or, at the root of the project, run:
 
 ```shell
 go test ./...
