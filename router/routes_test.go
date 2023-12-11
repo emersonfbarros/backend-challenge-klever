@@ -259,6 +259,16 @@ func TestRoutesIntegration(t *testing.T) {
 			expectedCode: http.StatusBadRequest,
 			httpMethod:   http.MethodPost,
 		},
+		{
+			name:         "Test send route on empty body values",
+			route:        "send",
+			utxoRouteRes: utxoResSuccess,
+			address:      address,
+			expectedBody: `{"message":"Request body is empty or malformed"}`,
+			expectedCode: http.StatusBadRequest,
+			httpMethod:   http.MethodPost,
+			postBody:     `{"address":"","amount":""}`,
+		},
 	}
 
 	for _, tt := range tests {
