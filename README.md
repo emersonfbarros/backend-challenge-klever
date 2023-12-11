@@ -95,6 +95,7 @@ _Response:_
 
 External API response time is calculated by making three simultaneous calls to the external api using goroutines.
 
+HTTP code: `200 OK`
 ```json
 {
   "status": "healthy",
@@ -109,10 +110,11 @@ External API response time is calculated by making three simultaneous calls to t
 
 **Details** [GET]: `/details/19SH3YrkrpWXKtCoMXWfoVpmUF1ZHAi24n`
 
-_Response:_
+_Possible responses:_
 
 Try with curl: `curl -svX GET 'http://localhost:8080/api/v1/details/19SH3YrkrpWXKtCoMXWfoVpmUF1ZHAi24n'`
 
+HTTP code: `200 OK`
 ```json
 {
   "address": "19SH3YrkrpWXKtCoMXWfoVpmUF1ZHAi24n",
@@ -129,12 +131,34 @@ Try with curl: `curl -svX GET 'http://localhost:8080/api/v1/details/19SH3YrkrpWX
 }
 ```
 
+HTTP code: `404 Not Found`
+```json
+{
+    "message": "Adress <invalid_address> not found"
+}
+```
+
+HTTP code: `500 Internal Server Error`
+```json
+{
+    "message": "Internal server error"
+}
+```
+
+HTTP code: `500 Bad Gateway`
+```json
+{
+    "message": "Failed to request external resource"
+}
+```
+
 **Balance** [GET]: `/balance/19SH3YrkrpWXKtCoMXWfoVpmUF1ZHAi24n`
 
 Try with curl: `curl -svX GET 'http://localhost:8080/api/v1/balance/19SH3YrkrpWXKtCoMXWfoVpmUF1ZHAi24n'`
 
 _Response:_
 
+HTTP code: `200 OK`
 ```json
 {
   "confirmed": "12845845",
@@ -142,12 +166,43 @@ _Response:_
 }
 ```
 
+HTTP code: `404 Not Found`
+```json
+{
+    "message": "Adress <invalid_address> not found"
+}
+```
+
+HTTP code: `500 Internal Server Error`
+```json
+{
+    "message": "Internal server error"
+}
+```
+
+HTTP code: `500 Bad Gateway`
+```json
+{
+    "message": "Failed to request external resource"
+}
+```
+
 **Send** [POST]: `/send`
+
+Request body:
+
+```json
+{
+  "address": "<string> - Bitcoin address",
+  "amount": "<string> - The amount to send (in Satoshis). Note that this should be a string representation of a number"
+}
+```
 
 Try with curl: `curl -svX POST "http://localhost:8080/api/v1/send" -H 'Content-Type: application/json' -d '{"address": "19SH3YrkrpWXKtCoMXWfoVpmUF1ZHAi24n", "amount": "1208053"}'`
 
 _Response:_
 
+HTTP code: `200 OK`
 ```json
 {
   "utxos": [
@@ -163,12 +218,41 @@ _Response:_
 }
 ```
 
+HTTP Code `400 Bad Request`
+```json
+{
+    "message": "Error message will depend on the specific issue with the request body"
+}
+```
+
+HTTP code: `404 Not Found`
+```json
+{
+    "message": "Adress <invalid_address> not found"
+}
+```
+
+HTTP code: `500 Internal Server Error`
+```json
+{
+    "message": "Internal server error"
+}
+```
+
+HTTP code: `500 Bad Gateway`
+```json
+{
+    "message": "Failed to request external resource"
+}
+```
+
 **Transaction** [GET]: `/tx/3654d26660dcc05d4cfb25a1641a1e61f06dfeb38ee2279bdb049d018f1830ab`
 
 _Response:_
 
 Try with curl `curl -svX GET 'http://localhost:8080/api/v1/tx/3654d26660dcc05d4cfb25a1641a1e61f06dfeb38ee2279bdb049d018f1830ab'`
 
+HTTP code: `200 OK`
 ```json
 {
   "addresses": [
@@ -188,6 +272,27 @@ Try with curl `curl -svX GET 'http://localhost:8080/api/v1/tx/3654d26660dcc05d4c
   ],
   "block": 675674,
   "txID": "3654d26660dcc05d4cfb25a1641a1e61f06dfeb38ee2279bdb049d018f1830ab"
+}
+```
+
+HTTP code: `404 Not Found`
+```json
+{
+    "message": "Adress <invalid_transaction_id> not found"
+}
+```
+
+HTTP code: `500 Internal Server Error`
+```json
+{
+    "message": "Internal server error"
+}
+```
+
+HTTP code: `500 Bad Gateway`
+```json
+{
+    "message": "Failed to request external resource"
 }
 ```
 
