@@ -269,6 +269,16 @@ func TestRoutesIntegration(t *testing.T) {
 			httpMethod:   http.MethodPost,
 			postBody:     `{"address":"","amount":""}`,
 		},
+		{
+			name:         "Test send route on body missing address",
+			route:        "send",
+			utxoRouteRes: utxoResSuccess,
+			address:      address,
+			expectedBody: `{"message":"'address' is required"}`,
+			expectedCode: http.StatusBadRequest,
+			httpMethod:   http.MethodPost,
+			postBody:     `{"address":"","amount":"310738"}`,
+		},
 	}
 
 	for _, tt := range tests {
