@@ -1,6 +1,7 @@
 package router
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"net/http"
@@ -11,6 +12,18 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 )
+
+func setupReq(method string, route string, value string, body string) *http.Request {
+	apiBaseURL := "/api/v1/"
+
+	if route == "send" {
+		req, _ := http.NewRequest(method, apiBaseURL+route, bytes.NewReader([]byte(body)))
+		return req
+	}
+
+	req, _ := http.NewRequest(method, apiBaseURL+route+value, nil)
+	return req
+}
 
 func TestRoutesIntegration(t *testing.T) {
 	utxoResSuccess := `[
@@ -65,13 +78,13 @@ func TestRoutesIntegration(t *testing.T) {
 	address := "19SH3YrkrpWXKtCoMXWfoVpmUF1ZHAi24n"
 	tx := "3654d26660dcc05d4cfb25a1641a1e61f06dfeb38ee2279bdb049d018f1830ab"
 	invalidAddress := "1nv4lid_4ddre55"
-	// invalidTx := "1nv4lid_7x"
+	invalidTx := "1nv4lid_7x"
 
 	serverErrorMsg := `{"error":"Whatever not found"}`
 	badGatewayMsg := `{"message":"Failed to request external resource"}`
 	internalErrorMsg := `{"message":"Internal server error"}`
 	notFoundAddress := fmt.Sprintf(`{"message":"Address %s not found"}`, invalidAddress)
-	// notFoundTx := fmt.Sprintf("Transaction %s not found", invalidTx)
+	notFoundTx := fmt.Sprintf(`{"message":"Transaction %s not found"}`, invalidTx)
 
 	tests := []struct {
 		name            string
@@ -83,6 +96,8 @@ func TestRoutesIntegration(t *testing.T) {
 		utxoRouteRes    string
 		txRouteRes      string
 		addressRouteRes string
+		postBody        string
+		httpMethod      string
 	}{
 		{
 			name:         "Test balance route on success",
@@ -91,6 +106,7 @@ func TestRoutesIntegration(t *testing.T) {
 			utxoRouteRes: utxoResSuccess,
 			expectedBody: `{"confirmed":"705425","unconfirmed":"0"}`,
 			expectedCode: http.StatusOK,
+			httpMethod:   http.MethodGet,
 		},
 		{
 			name:         "Test balance route on not found",
@@ -99,6 +115,7 @@ func TestRoutesIntegration(t *testing.T) {
 			utxoRouteRes: serverErrorMsg,
 			expectedBody: notFoundAddress,
 			expectedCode: http.StatusNotFound,
+			httpMethod:   http.MethodGet,
 		},
 		{
 			name:         "Test balance route on internal server error",
@@ -107,6 +124,7 @@ func TestRoutesIntegration(t *testing.T) {
 			utxoRouteRes: "invalid",
 			expectedBody: internalErrorMsg,
 			expectedCode: http.StatusInternalServerError,
+			httpMethod:   http.MethodGet,
 		},
 		{
 			name:         "Test balance route on external api failure",
@@ -115,6 +133,7 @@ func TestRoutesIntegration(t *testing.T) {
 			utxoRouteRes: "error",
 			expectedBody: badGatewayMsg,
 			expectedCode: http.StatusBadGateway,
+			httpMethod:   http.MethodGet,
 		},
 		{
 			name:            "Test details route on success",
@@ -124,15 +143,37 @@ func TestRoutesIntegration(t *testing.T) {
 			addressRouteRes: addressResSuccess,
 			expectedBody:    `{"address":"19SH3YrkrpWXKtCoMXWfoVpmUF1ZHAi24n","balance":"17454817","totalTx":647,"balanceCalc":{"confirmed":"705425","unconfirmed":"0"},"total":{"sent":"176043318","received":"193498135"}}`,
 			expectedCode:    http.StatusOK,
+			httpMethod:      http.MethodGet,
 		},
 		{
-			name:            "Test details route on error",
+			name:            "Test details route on not found",
 			address:         invalidAddress,
 			route:           "details/",
 			utxoRouteRes:    serverErrorMsg,
 			addressRouteRes: serverErrorMsg,
 			expectedBody:    notFoundAddress,
 			expectedCode:    http.StatusNotFound,
+			httpMethod:      http.MethodGet,
+		},
+		{
+			name:            "Test details route on internal server error",
+			address:         address,
+			route:           "details/",
+			utxoRouteRes:    "invalid",
+			addressRouteRes: "invalid",
+			expectedBody:    internalErrorMsg,
+			expectedCode:    http.StatusInternalServerError,
+			httpMethod:      http.MethodGet,
+		},
+		{
+			name:            "Test details route on external api failure",
+			address:         address,
+			route:           "details/",
+			utxoRouteRes:    "error",
+			addressRouteRes: "error",
+			expectedBody:    badGatewayMsg,
+			expectedCode:    http.StatusBadGateway,
+			httpMethod:      http.MethodGet,
 		},
 		{
 			name:         "Test tx route on success",
@@ -141,6 +182,132 @@ func TestRoutesIntegration(t *testing.T) {
 			txRouteRes:   txResSuccess,
 			expectedBody: `{"addresses":[{"address":"bc1qyzxdu4px4jy8gwhcj82zpv7qzhvc0fvumgnh0r","value":"484817655"},{"address":"36iYTpBFVZPbcyUs8pj3BtutZXzN6HPNA6","value":"623579"},{"address":"bc1qe29ydjtwyjdmffxg4qwtd5wfwzdxvnap989glq","value":"3283266"},{"address":"bc1qanhueax8r4cn52r38f2h727mmgg6hm3xjlwd0x","value":"90311"}],"block":675674,"txID":"3654d26660dcc05d4cfb25a1641a1e61f06dfeb38ee2279bdb049d018f1830ab"}`,
 			expectedCode: http.StatusOK,
+			httpMethod:   http.MethodGet,
+		},
+		{
+			name:         "Test tx route on not found",
+			tx:           invalidTx,
+			route:        "tx/",
+			txRouteRes:   serverErrorMsg,
+			expectedBody: notFoundTx,
+			expectedCode: http.StatusNotFound,
+			httpMethod:   http.MethodGet,
+		},
+		{
+			name:         "Test tx route on internal server error",
+			tx:           tx,
+			route:        "tx/",
+			txRouteRes:   "invalid",
+			expectedBody: internalErrorMsg,
+			expectedCode: http.StatusInternalServerError,
+			httpMethod:   http.MethodGet,
+		},
+		{
+			name:         "Test tx route on external api failure",
+			tx:           tx,
+			route:        "tx/",
+			txRouteRes:   "error",
+			expectedBody: badGatewayMsg,
+			expectedCode: http.StatusBadGateway,
+			httpMethod:   http.MethodGet,
+		},
+		{
+			name:         "Test send route on success",
+			route:        "send",
+			utxoRouteRes: utxoResSuccess,
+			address:      address,
+			expectedBody: `{"utxos":[{"txid":"1c16ffaad93464a35af0501b95274fe08e2f68beeadc1599cda14f2fb612f1b6","amount":"450460"}]}`,
+			expectedCode: http.StatusOK,
+			httpMethod:   http.MethodPost,
+			postBody:     fmt.Sprintf(`{"address":"%s","amount":"310738"}`, address),
+		},
+		{
+			name:         "Test send route on not found",
+			route:        "send",
+			address:      invalidAddress,
+			utxoRouteRes: serverErrorMsg,
+			expectedBody: notFoundAddress,
+			expectedCode: http.StatusNotFound,
+			httpMethod:   http.MethodPost,
+			postBody:     fmt.Sprintf(`{"address":"%s","amount":"310738"}`, invalidAddress),
+		},
+		{
+			name:         "Test send route on internal server error",
+			route:        "send",
+			utxoRouteRes: "invalid",
+			address:      address,
+			expectedBody: internalErrorMsg,
+			expectedCode: http.StatusInternalServerError,
+			httpMethod:   http.MethodPost,
+			postBody:     fmt.Sprintf(`{"address":"%s","amount":"310738"}`, address),
+		},
+		{
+			name:         "Test send route on external api failure",
+			route:        "send",
+			utxoRouteRes: "error",
+			expectedBody: badGatewayMsg,
+			expectedCode: http.StatusBadGateway,
+			httpMethod:   http.MethodPost,
+			postBody:     fmt.Sprintf(`{"address":"%s","amount":"310738"}`, address),
+		},
+		{
+			name:         "Test send route on empty body",
+			route:        "send",
+			utxoRouteRes: utxoResSuccess,
+			address:      address,
+			expectedBody: `{"message":"'address' and 'amount' must be strings"}`,
+			expectedCode: http.StatusBadRequest,
+			httpMethod:   http.MethodPost,
+		},
+		{
+			name:         "Test send route on empty body values",
+			route:        "send",
+			utxoRouteRes: utxoResSuccess,
+			address:      address,
+			expectedBody: `{"message":"Request body is empty or malformed"}`,
+			expectedCode: http.StatusBadRequest,
+			httpMethod:   http.MethodPost,
+			postBody:     `{"address":"","amount":""}`,
+		},
+		{
+			name:         "Test send route on body missing address",
+			route:        "send",
+			utxoRouteRes: utxoResSuccess,
+			address:      address,
+			expectedBody: `{"message":"'address' is required"}`,
+			expectedCode: http.StatusBadRequest,
+			httpMethod:   http.MethodPost,
+			postBody:     `{"address":"","amount":"310738"}`,
+		},
+		{
+			name:         "Test send route on body missing amount",
+			route:        "send",
+			utxoRouteRes: utxoResSuccess,
+			address:      address,
+			expectedBody: `{"message":"'amount' is required"}`,
+			expectedCode: http.StatusBadRequest,
+			httpMethod:   http.MethodPost,
+			postBody:     fmt.Sprintf(`{"address":"%s","amount":""}`, address),
+		},
+		{
+			name:         "Test send route on body amount invalid number",
+			route:        "send",
+			utxoRouteRes: utxoResSuccess,
+			address:      address,
+			expectedBody: `{"message":"'amount' must be a valid number"}`,
+			expectedCode: http.StatusBadRequest,
+			httpMethod:   http.MethodPost,
+			postBody:     fmt.Sprintf(`{"address":"%s","amount":"n0p"}`, address),
+		},
+		{
+			name:         "Test send route on body amount less than 0",
+			route:        "send",
+			utxoRouteRes: utxoResSuccess,
+			address:      address,
+			expectedBody: `{"message":"'amount' must be greater than zero"}`,
+			expectedCode: http.StatusBadRequest,
+			httpMethod:   http.MethodPost,
+			postBody:     fmt.Sprintf(`{"address":"%s","amount":"0"}`, address),
 		},
 	}
 
@@ -160,7 +327,7 @@ func TestRoutesIntegration(t *testing.T) {
 				}
 			}))
 
-			if tt.utxoRouteRes == "error" || tt.address == "error" || tt.txRouteRes == "error" {
+			if tt.utxoRouteRes == "error" || tt.addressRouteRes == "error" || tt.txRouteRes == "error" {
 				// closes server early to force request error
 				testServer.Close()
 			} else {
@@ -181,8 +348,9 @@ func TestRoutesIntegration(t *testing.T) {
 			} else {
 				routeValue = tt.address
 			}
-			// creates request for balance route
-			req, _ := http.NewRequest(http.MethodGet, "/api/v1/"+tt.route+routeValue, nil)
+
+			// creates reques for apllication server
+			req := setupReq(tt.httpMethod, tt.route, routeValue, tt.postBody)
 			resp := httptest.NewRecorder()
 
 			// handles request

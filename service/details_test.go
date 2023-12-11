@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"testing"
 
@@ -17,7 +16,6 @@ type MockServices struct {
 }
 
 func (m *MockServices) BalanceCalc(models model.IModels, address string) (*BalanceResult, error, int) {
-	fmt.Printf("\n\nCHAMOU O MOCK\n\n")
 	args := m.Called(models, address)
 	return args.Get(0).(*BalanceResult), args.Error(1), args.Int(2)
 }

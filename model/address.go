@@ -16,10 +16,8 @@ type AddressRes struct {
 func (handler *Models) Address(fetcher IFetcher, address string) (*AddressRes, error, int) {
 	body, err := fetcher.Fetch("address", address)
 	if err != nil {
-		fmt.Printf("\n\nERRO\n\n")
 		return nil, fmt.Errorf("Failed to request external resource"), http.StatusBadGateway
 	}
-	fmt.Printf("\n\nSEM ERRO\n\n")
 
 	var addressRes AddressRes
 	if err := json.Unmarshal(body, &addressRes); err != nil {
