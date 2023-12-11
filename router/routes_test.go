@@ -279,6 +279,16 @@ func TestRoutesIntegration(t *testing.T) {
 			httpMethod:   http.MethodPost,
 			postBody:     `{"address":"","amount":"310738"}`,
 		},
+		{
+			name:         "Test send route on body missing amount",
+			route:        "send",
+			utxoRouteRes: utxoResSuccess,
+			address:      address,
+			expectedBody: `{"message":"'amount' is required"}`,
+			expectedCode: http.StatusBadRequest,
+			httpMethod:   http.MethodPost,
+			postBody:     fmt.Sprintf(`{"address":"%s","amount":""}`, address),
+		},
 	}
 
 	for _, tt := range tests {
