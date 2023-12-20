@@ -23,7 +23,7 @@ type ExtTx struct {
 }
 
 func (handler *Models) GetTx(fetcher IFetcher, txId string) (*ExtTx, error, int) {
-	if value, ok := cacher.Get(txId); ok {
+	if value, ok := handler.cacher.Get(txId); ok {
 		if extTx, valid := value.(ExtTx); valid {
 			return &extTx, nil, 0
 		}
@@ -43,7 +43,7 @@ func (handler *Models) GetTx(fetcher IFetcher, txId string) (*ExtTx, error, int)
 		return nil, fmt.Errorf("Transaction %s not found", txId), http.StatusNotFound
 	}
 
-	cacher.Set(txId, extTx)
+	handler.cacher.Set(txId, extTx)
 
 	return &extTx, nil, 0
 }
