@@ -23,6 +23,12 @@ type ExtTx struct {
 }
 
 func (handler *Models) GetTx(fetcher IFetcher, txId string) (*ExtTx, error, int) {
+	if value, ok := cacher.Get(txId); ok {
+		if extTx, valid := value.(ExtTx); valid {
+			return &extTx, nil, 0
+		}
+	}
+
 	body, err := fetcher.Fetch("tx", txId)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to request external resource"), http.StatusBadGateway
@@ -36,6 +42,8 @@ func (handler *Models) GetTx(fetcher IFetcher, txId string) (*ExtTx, error, int)
 	if extTx.BlockHeight == 0 {
 		return nil, fmt.Errorf("Transaction %s not found", txId), http.StatusNotFound
 	}
+
+	cacher.Set(txId, extTx)
 
 	return &extTx, nil, 0
 }
