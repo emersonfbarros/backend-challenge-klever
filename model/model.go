@@ -23,10 +23,16 @@ type Fetcher struct {
 	logger   config.ILogger
 }
 
-type Models struct{}
+type Models struct {
+	cacher ICacher
+}
 
 func NewModels() *Models {
-	return &Models{}
+	return &Models{
+		cacher: &MemCache{
+			data: make(map[string]interface{}),
+		},
+	}
 }
 
 func NewFetcher() *Fetcher {
